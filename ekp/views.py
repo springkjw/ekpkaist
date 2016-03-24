@@ -1,18 +1,27 @@
 #-*- coding: utf-8 -*-
 from django.shortcuts import render
-from django.core import serializers
 import json
 import urllib2
 
-def book_list(request):
-    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=albumin,%20serum&prev=1&next=10"
+def book_list(request, keyword, page):
+    page_first = int(page) * 6  - 5
+    page_last = int(page) * 6
+
+    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    print url
     query = urllib2.urlopen(url).read()
 
     serialized_obj = json.loads(query)
 
+    count =  serialized_obj['total_doc']/6 + 2
+
+    print serialized_obj['total_doc']
+
     template = 'book_list.html'
     context = {
-        "test" : serialized_obj
+        "object" : serialized_obj,
+        "range" : range(1, count),
+        "keyword" : keyword
     }
 
     return render(request, template, context)

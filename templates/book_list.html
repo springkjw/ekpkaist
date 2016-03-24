@@ -1,26 +1,85 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block javascript %}
+    $(function() {
+        $('.ui.dropdown').dropdown();
+
+    });
+{% endblock %}
+
 {% block content %}
     <div class="ui main container">
-        <div class="ui divided items">
-            {% for item in test.books %}
-                <div class="item">
-                    <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}">
-                    <div class="middle aligned content">
-                        <a class="header">{{ item.book_source }}</a>
-                        <div class="meta">
-                            <div class="description">{{ item.book_author }}</div>
-                        </div>
-                        <div class="metadata">
-                            <span class="date">{{ item.book_year }}</span>
-                        </div>
-                        <div class="">
-                            {{ item.book_contents }}
-                        </div>
+        <div class="ui center aligned">
+            {% for obj in object.keywords %}
+                <a href="{% url 'book_list' keyword=obj.keyword_title page=1 %}" class="ui label" style="margin: 5px;">
+                    {{ obj.keyword_title }}
+                    <i class="delete icon"></i>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="ui two column centered grid" style="margin-top:20px;">
+            <div class="column">
+                <div class="ui fluid action input">
+                    <input type="text" placeholder="Search...">
+                    <div class="ui button">Search</div>
+                </div>
+            </div>
+        </div>
+        <div class="ui grid">
+            <div class="right floated left aligned three wide column">
+                <div class="ui selection dropdown">
+                    <input type="hidden" name="정렬기준">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">정렬 기준</div>
+                    <div class="menu">
+                        <div class="item" data-value="1">관찰값</div>
+                        <div class="item" data-value="0">개체간 영향</div>
+                        <div class="item" data-value="0">설명, 사실</div>
+                        <div class="item" data-value="0">행동</div>
+                        <div class="item" data-value="0">이유</div>
+                        <div class="item" data-value="0">상태변화</div>
+                        <div class="item" data-value="0">추론 과정</div>
+                        <div class="item" data-value="0">치료법</div>
+                        <div class="item" data-value="0">진단법</div>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+        </div>
+        <div class="ui top attached tabular menu">
+            <a class="active item" data-tab="book">Book</a>
+            <a class="item" data-tab="article">Article</a>
+        </div>
+        <div class="ui bottom attached active tab segment">
+            <div class="ui divided items">
+                {% for item in object.books %}
+                    <div class="item">
+                        <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
+                        <div class="middle aligned content">
+                            <a class="header">{{ item.book_source }}</a>
+                            <div class="metadata">
+                                <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
+                            </div>
+                            <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
+                                {{ item.book_highlighted_contents|safe }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="ui center aligned grid">
+        <div class="ui five column grid" style="margin:20px;">
+            <div class="column">
+                <div class="ui pagination menu">
+                    {% for i in range %}
+                        <a href="{% url 'book_list' keyword=keyword page=i %}" class="item">
+                            {{ i }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 {% endblock %}

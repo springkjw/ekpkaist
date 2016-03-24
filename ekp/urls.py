@@ -19,5 +19,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', 'ekp.views.book_list', name='book_list'),
+    # url(r'^$', 'ekp.views.book_list', name='book_list'),
+
+    url(r'^books/(?P<keyword>[\w\ ]+)/page=(?P<page>\d+)$', 'ekp.views.book_list', name='book_list'),
 ]
