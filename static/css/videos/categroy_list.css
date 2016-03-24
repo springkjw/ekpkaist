@@ -1,0 +1,31 @@
+.main.container {
+    margin-top: 7em;
+}
+
+h3 {
+    color: #576366;
+}
+
+.card {
+    width: 100% !important;
+
+}
+
+.card .content .book {
+    color: #FFFFFF;
+}
+
+.card .description {
+    overflow: hidden;
+}
+
+p.description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.5em;
+    max-height: 4em;
+}
+

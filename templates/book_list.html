@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="ui main container">
+        <div class="ui divided items">
+            {% for item in test.books %}
+                <div class="item">
+                    <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}">
+                    <div class="middle aligned content">
+                        <a class="header">{{ item.book_source }}</a>
+                        <div class="meta">
+                            <div class="description">{{ item.book_author }}</div>
+                        </div>
+                        <div class="metadata">
+                            <span class="date">{{ item.book_year }}</span>
+                        </div>
+                        <div class="">
+                            {{ item.book_contents }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

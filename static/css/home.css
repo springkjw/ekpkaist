@@ -1,0 +1,23 @@
+.ui.middle {
+    margin-top: 55px;
+    padding: 50px 0 50px 0;
+    min-height: 400px;
+    background-color: #78BFCE;
+}
+
+.column h3 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.segment.top {
+    background-color: #E45D52;
+    padding-top: 20px;
+}
+
+.ui.green.button {
+    background-color: #69A588;
+}
+
+.ui.green.button:hover{
+    background-color: #69A588;
+}

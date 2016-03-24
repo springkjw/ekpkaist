@@ -1,0 +1,24 @@
+.main.container {
+    margin-top: 1em;
+}
+
+h3 {
+    color: #576366;
+}
+.ui.masthead.segment {
+    margin-top: 55px;
+    min-height: 300px;
+}
+
+.ui.header {
+    padding: 150px;
+    color: #ffffff;
+}
+
+.right {
+    float: right;
+}
+
+.main.ui.grid {
+    margin-top: 1em;
+}

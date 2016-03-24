@@ -1,0 +1,27 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>곰개발{% block title %}{% endblock %}</title>
+
+    <script type="text/javascript" src="{% static 'js/jquery-2.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Semantic-UI-CSS-master/semantic.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
+    {% block javascript %}
+    {% endblock %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-CSS-master/semantic.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    {% include 'header.html' %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include 'footer.html' %}
+</body>
+</html>
