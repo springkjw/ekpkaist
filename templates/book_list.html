@@ -6,6 +6,19 @@
         $('.ui.dropdown').dropdown();
 
     });
+
+    function button_click() {
+        var data = $('.search').val();
+
+        if(data == '') {
+            alert("검색어를 입력해주세요.");
+            return;
+        }
+
+        var url = '/books/' + data + '/page=1';
+
+        $(location).attr('href', url);
+    }
 {% endblock %}
 
 {% block content %}
@@ -21,8 +34,8 @@
         <div class="ui two column centered grid" style="margin-top:20px;">
             <div class="column">
                 <div class="ui fluid action input">
-                    <input type="text" placeholder="Search...">
-                    <div class="ui button">Search</div>
+                    <input class="search" type="text" placeholder="Search..." onkeypress="if(event.keyCode==13) {button_click(); return false;}">
+                    <div class="ui button" onclick="button_click();">Search</div>
                 </div>
             </div>
         </div>
@@ -47,7 +60,7 @@
             </div>
         </div>
         <div class="ui top attached tabular menu">
-            <a class="active item" data-tab="book">Book</a>
+            <a class="active item" data-tab="book">Book ({{ object.total_doc }})</a>
             <a class="item" data-tab="article">Article</a>
         </div>
         <div class="ui bottom attached active tab segment">
@@ -56,7 +69,7 @@
                     <div class="item">
                         <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
                         <div class="middle aligned content">
-                            <a class="header">{{ item.book_source }}</a>
+                            <a class="header" href="{% url 'book_detail' keyword=keyword num=num|add:forloop.counter %}">{{ item.book_source }}</a>
                             <div class="metadata">
                                 <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
                             </div>
@@ -69,15 +82,21 @@
             </div>
         </div>
         <div class="ui center aligned grid">
-        <div class="ui five column grid" style="margin:20px;">
+        <div class="ui column grid" style="margin:20px;">
             <div class="column">
+                {% if not count_1 == 0 %}
+                    <a href="{% url 'book_list' keyword=keyword page=count_1|add:-9 %}"><i class="chevron left icon"></i></a>
+                {% endif %}
                 <div class="ui pagination menu">
                     {% for i in range %}
-                        <a href="{% url 'book_list' keyword=keyword page=i %}" class="item">
+                        <a href="{% url 'book_list' keyword=keyword page=i %}" class="item {% if i == page %}active{% endif %}">
                             {{ i }}
                         </a>
                     {% endfor %}
                 </div>
+                {% if not count_mod == count_data %}
+                    <a href="{% url 'book_list' keyword=keyword page=count_2|add:1 %}"><i class="chevron right icon"></i></a>
+                {% endif %}
             </div>
         </div>
         </div>
