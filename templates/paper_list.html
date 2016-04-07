@@ -1,41 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block javascript %}
-    var content = [
-    ];
-
-    {% for obj in object.keywords %}
-        content.push({ title : '{{ obj.keyword_title }}'});
-    {% endfor %}
-
-    $(function() {
-        $('.ui.dropdown').dropdown();
-
-        $('.delete').on('click', function() {
-            var keyword = $(this).parent().find('.keyword').text();
-            $(this).parent().hide();
-        });
-
-        $('.ui.search').search({
-            source: content
-        });
-    });
-
-    function button_click() {
-        var data = $('.prompt').val();
-
-        if(data == '') {
-            alert("검색어를 입력해주세요.");
-            return;
-        }
-
-        var url = '/books/' + data + '/page=1';
-
-        $(location).attr('href', url);
-    }
-{% endblock %}
-
 {% block content %}
     <div class="ui main container">
         <div class="ui center aligned">
@@ -79,21 +44,21 @@
             </div>
         </div>
         <div class="ui top attached tabular menu">
-            <a class="active item" data-tab="book">Book ({{ object.total_doc }})</a>
-            <a class="item" data-tab="article" href="{% url 'paper_list' keyword=keyword page=1 %}">Article ({{ paper.total_doc }})</a>
+            <a class="item" data-tab="book" href="{% url 'book_list' keyword=keyword page=1 %}">Book ({{ book.total_doc }})</a>
+            <a class="active item" data-tab="article">Article ({{ object.total_doc }})</a>
         </div>
         <div class="ui bottom attached active tab segment">
             <div class="ui divided items">
-                {% for item in object.books %}
+                {% for item in object.journals %}
                     <div class="item">
-                        <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
                         <div class="middle aligned content">
-                            <a class="header" href="{% url 'book_detail' keyword=keyword num=num|add:forloop.counter %}">{{ item.book_source }}</a>
+                            <a class="header" onclick="window.open('{{ item.pmc_url }}');">{{ item.title }}</a>
                             <div class="metadata">
-                                <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
+                                <span class="description">{{ item.author }}</span><br/>
+                                <span class="date">{{ item.journal_title}} , {{ item.date }}</span>
                             </div>
                             <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
-                                {{ item.book_highlighted_contents|safe }}
+                                {{ item.highlighted_contents|safe }}
                             </div>
                         </div>
                     </div>
@@ -104,17 +69,17 @@
         <div class="ui column grid" style="margin:20px;">
             <div class="column">
                 {% if not count_1 == 0 %}
-                    <a href="{% url 'book_list' keyword=keyword page=count_1|add:-9 %}"><i class="chevron left icon"></i></a>
+                    <a href="{% url 'paper_list' keyword=keyword page=count_1|add:-9 %}"><i class="chevron left icon"></i></a>
                 {% endif %}
                 <div class="ui pagination menu">
                     {% for i in range %}
-                        <a href="{% url 'book_list' keyword=keyword page=i %}" class="item {% if i == page %}active{% endif %}">
+                        <a href="{% url 'paper_list' keyword=keyword page=i %}" class="item {% if i == page %}active{% endif %}">
                             {{ i }}
                         </a>
                     {% endfor %}
                 </div>
                 {% if not count_mod == count_data %}
-                    <a href="{% url 'book_list' keyword=keyword page=count_2|add:1 %}"><i class="chevron right icon"></i></a>
+                    <a href="{% url 'paper_list' keyword=keyword page=count_2|add:1 %}"><i class="chevron right icon"></i></a>
                 {% endif %}
             </div>
         </div>

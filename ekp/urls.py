@@ -19,8 +19,9 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    # url(r'^$', 'ekp.views.book_list', name='book_list'),
+    url(r'^$', 'ekp.views_home.home', name='home'),
 
     url(r'^books/(?P<keyword>[\w\ ]+)/page=(?P<page>\d+)$', 'ekp.views.book_list', name='book_list'),
+    url(r'^papers/(?P<keyword>[\w\ ]+)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),
     url(r'^book/(?P<keyword>[\w\ ]+)/num=(?P<num>\d+)$', 'ekp.views.book_detail', name='book_detail'),
 ]
