@@ -1,7 +1,13 @@
 <div class="ui top fixed" style="margin-bottom: 10px;">
   <div class="ui segment">
-        <h4 class="ui center aligned header">
-            관련 의학 정보
-        </h4>
+        {% if 'book' in request.path or 'paper' in request.path %}
+            <h4 class="ui center aligned header">
+                관련 의학 정보
+            </h4>
+        {% else %}
+            <h4 class="ui center aligned header">
+                혈종결과관리
+            </h4>
+        {% endif %}
   </div>
 </div>

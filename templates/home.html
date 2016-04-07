@@ -1,6 +1,173 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block javascript %}
+    $(function() {
+        var now = new Date();
+        $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+
+        $('tbody.patient_info tr').on('click', function() {
+            if($(this).hasClass('active')) {
+                $(this).removeClass('active');
+            }else {
+                $(this).parent().children().removeClass('active');
+                $(this).addClass('active');
+
+                var data_id = $(this).attr('data-id');
+
+                $.ajax({
+                    url : '/',
+                    data : {
+                        id: data_id
+                    },
+                    success : function(data) {
+                        var record_date = data.patient_data.recorded_date;
+                        var hospital = data.patient_data.clinic.name;
+                        var office = data.patient_data.office.name;
+                        var receipt_num = data.patient_data.receipt_number;
+                        var name = data.patient_data.patient.name;
+                        var sex;
+                        if(data.patient_data.patient.sex == 'male') {
+                            sex = '남';
+                        }else {
+                            sex = '여';
+                        }
+                        var age = data.patient_data.patient.age;
+
+                        $('.record_date_data').val(record_date);
+                        $('.hospital_data').val(hospital);
+                        $('.office_data').val(office);
+                        $('.receipt_num_data').val(receipt_num);
+                        $('.name_data').val(name);
+                        $('.sex_data').val(sex);
+                        $('.age_data').val(age);
+
+                        getTest(data);
+                        conclusion(data);
+                    }
+                });
+            }
+        });
+    });
+
+    function getTest(data) {
+        var get_test = data.test_data.tests;
+        $('.get_test_data').html('');
+        var category = [];
+        var sorted_category = [];
+
+        for(var i = 0; i < get_test.length; i++) {
+            if(get_test[i].category !== null) {
+                category.push(get_test[i].category);
+            }
+        }
+
+        $.each(category, function(i, e1) {
+            if($.inArray(e1, sorted_category) === -1) sorted_category.push(e1);
+        });
+
+        for(var i = 0; i < sorted_category.length; i++) {
+            if(sorted_category[i] !== null) {
+                var html = '<tr class="category category_' + i + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';
+                $('.get_test_data').append(html);;
+            }
+        }
+
+        for(var j = 0; j < get_test.length; j++) {
+            for(var k = 0; k < sorted_category.length; k++) {
+                if(get_test[j].category == sorted_category[k]) {
+                    var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td class="warning">' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';
+                    var selector = '.category_' + k;
+
+                    $(html2).insertAfter(selector);
+                }
+            }
+        }
+    }
+
+
+    function conclusion(data) {
+        var conclusion = data.conclusion.conclusions;
+        $('.conclusion').html('');
+
+        for(var i = 0; i < conclusion.length; i++) {
+            var html3 = '<div class="item active"><div class="right floated content"><div class="ui checkbox"><input type="checkbox" id="is_print" name="print" style="opacity: 1 !important;"></div></div><div class="content">' + conclusion[i].text + '</div></div>';
+
+            $('.conclusion').append(html3);
+        }
+    }
+
+
+    $(document).ready(function() {
+        $('#is_print').click(function() {
+            console.log('a');
+        });
+    });
+
+{% endblock %}
+
 {% block content %}
-    {{ object }}
+<div class="ui main" style="margin: 0 10px 0 10px;">
+    <h2>종합보기</h2>{{ patient_data.cases.recorded_date }}
+    <div class="ui grid ">
+        <div class="sixteen wide column">
+            <table class="ui table">
+                <tr>
+                    <td class="active two wide center aligned"><strong>환자 정보</strong></td>
+                    <td class="current two wide center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="hospital two wide center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="ofiice two wide center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="receipt_num two wide center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="name two wide center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="sex one wide center aligned">성별 - <input class="sex_data ui basic label center aligned fluid" readonly value="   " /></td>
+                    <td class="age one wide center aligned">나이 - <input class="age_data ui basic label center aligned fluid" readonly value="   " /></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="ui grid">
+        <div class="two wide column">
+            <table class="ui compact  center aligned table" style="height:900px; overflow:scroll;">
+                <thead>
+                    <tr>
+                        <th class="ten wide">접수일자</th>
+                        <th class="six wide">접수번호</th>
+                    </tr>
+                </thead>
+                <tbody class="patient_info">
+                    {% for item in object.cases %}
+                        <tr data-id="{{ item.id }}">
+                            <td>{{ item.recorded_date }}</td>
+                            <td>{{ item.receipt_number }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="fourteen wide column">
+            <div class="ui grid">
+                    <div class="ui segment six wide column" style="height: 700px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
+                        <table class="ui compact padded center aligned table">
+                            <tbody class="get_test_data">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ui stacked segments eight wide column" style="height: 700px; padding: 0; overflow:scroll;">
+                        <div class="ui secondary segment">
+                            <div class="ui equal width grid">
+                                <h3 class="column">소견 내용</h3>
+                                <div class="column ui right aligned">출력</div>
+                            </div>
+                        </div>
+                        <div class="ui segment">
+                            <div class="conclusion ui very relaxed large divided list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
