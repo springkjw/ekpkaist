@@ -48,6 +48,37 @@
                 });
             }
         });
+
+        $('.conclusion').on('click', '.conclusion_content .content', function() {
+            if(!$(this).parent().hasClass('active')){
+                $(this).parent().parent().children().removeClass('active');
+                $(this).parent().addClass('active');
+
+                var data_rule_id = $(this).parent().attr('data-rule-id');
+
+                $.ajax({
+                    url : '/',
+                    data : {
+                        rule_id: data_rule_id
+                    },
+                    success : function(data) {
+                        ruleData(data);
+                    }
+                });
+
+            }else{
+                $(this).parent().removeClass('active');
+            };
+        });
+
+        $('.conclusion').on('click', '#is_print', function() {
+            if(!$(this).is(":checked")) {
+                $(this).parent().parent().parent().find('.content').css('text-decoration', 'line-through');
+            }else {
+                $(this).parent().parent().parent().find('.content').css('text-decoration', '');
+            }
+        });
+
     });
 
     function getTest(data) {
@@ -91,18 +122,29 @@
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<div class="item active"><div class="right floated content"><div class="ui checkbox"><input type="checkbox" id="is_print" name="print" style="opacity: 1 !important;"></div></div><div class="content">' + conclusion[i].text + '</div></div>';
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '"><td class="content">' + conclusion[i].text + '</td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
 
             $('.conclusion').append(html3);
         }
     }
 
+    function ruleData(data) {
+        var condition = data.rule.conditions;
+        var conclusion = data.rule.conclusion;
+        $('.rule_condition').html('');
+        $('.rule_content').html('');
 
-    $(document).ready(function() {
-        $('#is_print').click(function() {
-            console.log('a');
-        });
-    });
+        for(var i = 0; i < condition.length; i++) {
+            var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
+            if(i != condition.length - 1) {
+                html4 += '<br/>&&<br/>';
+            }
+
+            $('.rule_condition').append(html4);
+        }
+
+        $('.rule_content').append(conclusion);
+    }
 
 {% endblock %}
 
@@ -153,19 +195,41 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="ui stacked segments eight wide column" style="height: 700px; padding: 0; overflow:scroll;">
-                        <div class="ui secondary segment">
-                            <div class="ui equal width grid">
-                                <h3 class="column">소견 내용</h3>
-                                <div class="column ui right aligned">출력</div>
-                            </div>
-                        </div>
-                        <div class="ui segment">
-                            <div class="conclusion ui very relaxed large divided list">
-                            </div>
-                        </div>
+                    <div class="ui eight wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
+                        <table class="ui  padded table">
+                            <thead>
+                                <tr>
+                                    <th class="twelve wide">소견 내용</th>
+                                    <th class="four wide ui right aligned">출력</th>
+                                </tr>
+                            </thead>
+                            <tbody class="conclusion">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; overflow:scroll; padding: 0;">
+                        <table class="ui celled table">
+                            <thead>
+                                <tr>
+                                    <td colspan="2">소견 생성 규칙</td>
+                                </tr>
+                                <tr>
+                                    <td>- 검사 결과 조건</td>
+                                    <td>- 소견 내용</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="height: 100%;">
+                                    <td class="rule_condition"></td>
+                                    <td class="rule_content"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

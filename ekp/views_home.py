@@ -10,26 +10,39 @@ def home(request):
 
     serialized_obj = json.loads(query)
 
+
+    print request
     if request.is_ajax():
-        print request.GET['id']
-        url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id']
-        url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/tests"
-        url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/conclusions"
+        if(request.GET.get('id', False)):
+            url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id']
+            url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/tests"
+            url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/conclusions"
 
-        query_data = urllib2.urlopen(url_data).read()
-        query_test_data = urllib2.urlopen(url_test_data).read()
-        query_conclusion_data = urllib2.urlopen(url_conclusion_data).read()
+            query_data = urllib2.urlopen(url_data).read()
+            query_test_data = urllib2.urlopen(url_test_data).read()
+            query_conclusion_data = urllib2.urlopen(url_conclusion_data).read()
 
-        serialized_obj_data = json.loads(query_data)
-        serialized_obj_test_data = json.loads(query_test_data)
-        serialized_obj_conclusion_data = json.loads(query_conclusion_data)
+            serialized_obj_data = json.loads(query_data)
+            serialized_obj_test_data = json.loads(query_test_data)
+            serialized_obj_conclusion_data = json.loads(query_conclusion_data)
 
-        context = {
-            "patient_data" : serialized_obj_data,
-            "test_data" : serialized_obj_test_data,
-            "conclusion" : serialized_obj_conclusion_data
-        }
-        return JsonResponse(context)
+            context = {
+                "patient_data" : serialized_obj_data,
+                "test_data" : serialized_obj_test_data,
+                "conclusion" : serialized_obj_conclusion_data
+            }
+            return JsonResponse(context)
+        else:
+            print request.GET['rule_id']
+            url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
+
+            query_rule_data = urllib2.urlopen(url_rule_data).read()
+            serialized_obj_rule_data = json.loads(query_rule_data)
+
+            context = {
+                "rule" : serialized_obj_rule_data
+            }
+            return JsonResponse(context)
 
     else:
         context = {
