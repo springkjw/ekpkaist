@@ -1,14 +1,17 @@
 #-*- coding: utf-8 -*-
 from django.shortcuts import render
 import json
+import urllib
 import urllib2
 
 def book_list(request, keyword, page):
     page_first = int(page) * 6  - 5
     page_last = int(page) * 6
 
-    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword.replace(" ", "%20").replace(",", "%20") + "&prev=" + str(page_first) + "&next=" + str(page_last)
-    url_paper = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword.replace(" ", "%20").replace(",", "%20") + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
+
+    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    url_paper = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
 
     query = urllib2.urlopen(url).read()
     query_paper = urllib2.urlopen(url_paper).read()
@@ -49,7 +52,9 @@ def book_list(request, keyword, page):
 
 def book_detail(request, keyword, num):
 
-    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword.replace(" ", "%20").replace(",", "%20") + "&prev=" + str(num) + "&next=" + str(num)
+    keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
+
+    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(num) + "&next=" + str(num)
 
     query = urllib2.urlopen(url).read()
 
@@ -70,8 +75,10 @@ def paper_list(request, keyword, page):
     page_first = int(page) * 6 - 5
     page_last = int(page) * 6
 
-    url = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword.replace(" ", "%20").replace(",", "%20") + "&prev=" + str(page_first) + "&next=" + str(page_last)
-    url_book = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword.replace(" ", "%20").replace(",", "%20") + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
+
+    url = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    url_book = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
 
     query = urllib2.urlopen(url).read()
     query_book = urllib2.urlopen(url_book).read()

@@ -55,14 +55,21 @@
                 $(this).parent().addClass('active');
 
                 var data_rule_id = $(this).parent().attr('data-rule-id');
+                var data_text = $(this).parent().attr('data-text');
+
+                var url = 'books/' + data_text + '/page=1';
+
+                $('.more-book').attr('href', url);
 
                 $.ajax({
                     url : '/',
                     data : {
-                        rule_id: data_rule_id
+                        rule_id: data_rule_id,
+                        text : data_text
                     },
                     success : function(data) {
                         ruleData(data);
+                        bookData(data);
                     }
                 });
 
@@ -122,7 +129,7 @@
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '"><td class="content">' + conclusion[i].text + '</td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
 
             $('.conclusion').append(html3);
         }
@@ -144,6 +151,25 @@
         }
 
         $('.rule_content').append(conclusion);
+    }
+
+    function bookData(data) {
+        var book = data.book
+        var topic = book.topics;
+        var books = book.books;
+
+        for(var i = 0; i < topic.length; i++) {
+            var html5 = '<a href="#" class="ui label" style="margin: 5px;"><span class="keyword">' + topic[i].topic_title + '</span></a>';
+
+            $('.topic').append(html5);
+        }
+
+        for(var j = 0; j < books.length; j++) {
+            var html6 = '<div class="item"><img class="ui middle aligned tiny image" src="' + books[j].book_image_url + '" style="max-height: 100px;"><div class="middle aligned content"><a class="header" href="#">' + books[j].book_source + '</a><div class="metadata"><strong class="date">' + books[j].book_year + '</strong> by <span class="description">' + books[j].book_author + '</span></div><div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">' + books[j].book_highlighted_contents + '</div></div></div>';
+
+            $('.book').append(html6);
+        }
+
     }
 
 {% endblock %}
@@ -196,7 +222,7 @@
                         </table>
                     </div>
                     <div class="ui eight wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
-                        <table class="ui  padded table">
+                        <table class="ui padded table">
                             <thead>
                                 <tr>
                                     <th class="twelve wide">소견 내용</th>
@@ -208,25 +234,44 @@
                         </table>
                     </div>
                     <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; overflow:scroll; padding: 0;">
-                        <table class="ui celled table">
+                        <table class="ui celled padded fixed table">
                             <thead>
                                 <tr>
-                                    <td colspan="2">소견 생성 규칙</td>
+                                    <th colspan="2">소견 생성 규칙</th>
                                 </tr>
-                                <tr>
-                                    <td>- 검사 결과 조건</td>
-                                    <td>- 소견 내용</td>
+                                <tr class="center aligned">
+                                    <th>- 검사 결과 조건</th>
+                                    <th>- 소견 내용</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr style="height: 100%;">
-                                    <td class="rule_condition"></td>
-                                    <td class="rule_content"></td>
+                                    <td class="rule_condition center aligned" style="height:178px;"></td>
+                                    <td class="rule_content center aligned" style="height:178px;"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
+                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
+                        <table class="ui padded table">
+                            <thead>
+                                <tr>
+                                    <th>관련 의학 자료</th>
+                                    <th class="right aligned"><a href="#" class="more-book"><button class="ui button">더 알아보기</button></a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="height: 40px;">
+                                    <td colspan="2" class="topic"></td>
+                                </tr>
+                                <tr style="height: 280px;">
+                                    <td colspan="2">
+                                        <div class="ui divided items book">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

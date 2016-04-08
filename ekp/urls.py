@@ -20,9 +20,9 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', 'ekp.views_home.home', name='home'),
-    url(r'^/(?P<id>\d+)$', 'ekp.views_home.home_patient', name='home_patient'),
+    url(r'^patient/', 'ekp.views_home.home_patient', name='home_patient'),
 
-    url(r'^books/(?P<keyword>[\w\ ]+)/page=(?P<page>\d+)$', 'ekp.views.book_list', name='book_list'),
-    url(r'^papers/(?P<keyword>[\w\ ]+)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),
-    url(r'^book/(?P<keyword>[\w\ ]+)/num=(?P<num>\d+)$', 'ekp.views.book_detail', name='book_detail'),
+    url(r'^books/(?P<keyword>[\w.\ ]+)/page=(?P<page>\d+)$', 'ekp.views.book_list', name='book_list'),
+    url(r'^papers/(?P<keyword>[\w.\ ]+)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),
+    url(r'^book/(?P<keyword>[\w.\ ]+)/num=(?P<num>\d+)$', 'ekp.views.book_detail', name='book_detail'),
 ]

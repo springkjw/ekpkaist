@@ -1,72 +1,12 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-
-{% block javascript %}
-    $(function() {
-        var now = new Date();
-        $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-
-        $('tbody tr').on('click', function() {
-            if($(this).hasClass('active')) {
-                $(this).removeClass('active');
-            }else {
-                $(this).parent().children().removeClass('active');
-                $(this).addClass('active');
-
-                var data_id = $(this).attr('data-id');
-
-                $.ajax({
-                    url : '/',
-                    data : {
-                        id: data_id
-                    },
-                });
-            }
-        });
-    });
-
-    function patientData(data) {
-
-    }
-{% endblock %}
 
 {% block content %}
-<div class="ui main" style="margin: 0 10px 0 10px;">
-    <h2>종합보기</h2>{{ patient_data.cases.recorded_date }}
-    <div class="ui grid">
-        <div class="sixteen wide column">
-            <table class="ui table">
-                <tr>
-                    <td class="active two wide center aligned"><strong>환자 정보</strong></td>
-                    <td class="current two wide center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label" readonly value="   " /></td>
-                    <td class="record_date two wide center aligned">병원명 - <input class="record_date_data ui basic label" readonly val="   " /></td>
-                    <td class="record_date two wide center aligned">영업소 - <span class="record_date_data ui basic label"></span></td>
-                    <td class="record_date two wide center aligned">접수번호 - <span class="record_date_data ui basic label"></span></td>
-                    <td class="record_date two wide center aligned">환자명 - <span class="record_date_data ui basic label"></span></td>
-                    <td class="record_date one wide center aligned">성별 - <span class="record_date_data ui basic label"></span></td>
-                    <td class="record_date one wide center aligned">나이 - <span class="record_date_data ui basic label"></span></td>
-                </tr>
-            </table>
-        </div>
-        <div class="two wide column">
-            <table class="ui compact padded center aligned table">
-                <thead>
-                    <tr>
-                        <th class="ten wide">접수일자</th>
-                        <th class="six wide">접수번호</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in object.cases %}
-                        <tr data-id="{{ item.id }}">
-                            <td>{{ item.recorded_date }}</td>
-                            <td>{{ item.receipt_number }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+
+{{ query }}<br/>
+
+
+{{ url }}<br/>
+
+{{ url_decode }}
+
 {% endblock %}
