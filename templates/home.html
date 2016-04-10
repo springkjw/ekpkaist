@@ -101,25 +101,82 @@
         }
 
         $.each(category, function(i, e1) {
-            if($.inArray(e1, sorted_category) === -1) sorted_category.push(e1);
+            if($.inArray(e1, sorted_category) === -1) {
+                sorted_category.push(e1);
+            }else{
+                if($.inArray('null' , sorted_category) === -1) {
+                    sorted_category.push('null');
+                }
+            }
         });
 
-        for(var i = 0; i < sorted_category.length; i++) {
-            if(sorted_category[i] !== null) {
-                var html = '<tr class="category category_' + i + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';
-                $('.get_test_data').append(html);;
+        $.each(category, function(i, e1) {
+            if($.inArray(e1, sorted_category) !== -1) {
+                if($.inArray('null' , sorted_category) === -1) {
+                    sorted_category.push('null');
+                }
             }
+        });
+
+        var a = 1;
+        for(var i = 0; i < sorted_category.length; i++) {
+            if(sorted_category[i] !== 'null') {
+                var html = '<tr class="category category_' + a + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';
+                $('.get_test_data').append(html);
+
+                a = a + 1;
+            }
+
+        }
+
+        if($.inArray('null', sorted_category)) {
+            var html_null = '<tr class="category category_' + sorted_category.length + '"><td class="negative" colspan="3">' + '정의 되지 않음' + '</td></tr>';
+            $('.get_test_data').append(html_null);
         }
 
         for(var j = 0; j < get_test.length; j++) {
-            for(var k = 0; k < sorted_category.length; k++) {
-                if(get_test[j].category == sorted_category[k]) {
-                    var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td class="warning">' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';
-                    var selector = '.category_' + k;
+            if(get_test[j].category === null) {
+                get_test[j].category = '정의 되지 않음';
+            }
+
+            $('.category').each(function(k) {
+                if(get_test[j].category == $(this).find('.negative').text()) {
+
+                    if(get_test[j].category != 'null') {
+                        var selector = '.category_' + (k + 1);
+                    }
+
+                    if(get_test[j].component === null) {
+                        get_test[j].component = '';
+                    }
+
+                    if(get_test[j].evaluation === null || get_test[j].evaluation == 'normal') {
+                        get_test[j].evaluation = '';
+                    }else if(get_test[j].evaluation == 'high') {
+                        get_test[j].evaluation = 'H';
+                    }else if(get_test[j].evaluation == 'low') {
+                        get_test[j].evaluation = 'L';
+                    }
+
+                    var b = '';
+                    if(get_test[j].evaluation == 'H' || get_test[j].evaluation == 'L') {
+                        b = 'style="background-color: red; color: white;"';
+                    }else {
+                        b = 'class="warning"';
+                    }
+
+                    console.log(b);
+
+                    var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td ' + b + '>' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';
+
+
+
+
 
                     $(html2).insertAfter(selector);
                 }
-            }
+            });
+
         }
     }
 

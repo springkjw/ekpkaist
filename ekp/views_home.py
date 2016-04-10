@@ -27,6 +27,8 @@ def home(request):
             serialized_obj_test_data = json.loads(query_test_data)
             serialized_obj_conclusion_data = json.loads(query_conclusion_data)
 
+
+
             context = {
                 "patient_data" : serialized_obj_data,
                 "test_data" : serialized_obj_test_data,
