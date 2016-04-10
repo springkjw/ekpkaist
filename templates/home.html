@@ -70,11 +70,21 @@
                     success : function(data) {
                         ruleData(data);
                         bookData(data);
+                    },
+                    beforeSend : function() {
+                        $('.dimmer').addClass('active');
+                    },
+                    complete : function() {
+                        $('.dimmer').removeClass('active');
                     }
                 });
 
             }else{
                 $(this).parent().removeClass('active');
+                $('.rule_condition').text('');
+                $('.rule_content').text('');
+                $('.topic').html('');
+                $('.book').html('');
             };
         });
 
@@ -165,8 +175,6 @@
                         b = 'class="warning"';
                     }
 
-                    console.log(b);
-
                     var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td ' + b + '>' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';
 
 
@@ -211,6 +219,8 @@
     }
 
     function bookData(data) {
+        $('.topic').html('');
+        $('.book').html('');
         var book = data.book
         var topic = book.topics;
         var books = book.books;
@@ -252,12 +262,14 @@
         </div>
     </div>
     <div class="ui grid">
-        <div class="two wide column">
-            <table class="ui compact  center aligned table" style="height:900px; overflow:scroll;">
+        <div class="two wide column" style="height:900px; overflow:scroll;">
+            <table class="ui compact  center aligned table">
                 <thead>
                     <tr>
                         <th class="ten wide">접수일자</th>
                         <th class="six wide">접수번호</th>
+                        <th class="six wide">환자명</th>
+                        <th class="six wide">병원명</th>
                     </tr>
                 </thead>
                 <tbody class="patient_info">
@@ -265,6 +277,8 @@
                         <tr data-id="{{ item.id }}">
                             <td>{{ item.recorded_date }}</td>
                             <td>{{ item.receipt_number }}</td>
+                            <td>{{ item.patient.name }}</td>
+                            <td>{{ item.clinic.name }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -308,6 +322,11 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="ui dimmer">
+                            <div class="ui text loader">
+                                Loading
+                            </div>
+                        </div>
                     </div>
                     <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
                         <table class="ui padded table">
@@ -329,6 +348,11 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="ui dimmer">
+                            <div class="ui text loader">
+                                Loading
+                            </div>
+                        </div>
                     </div>
                 </div>
 
