@@ -128,64 +128,151 @@
             }
         });
 
-        var a = 1;
+        var table_data = [];
+
         for(var i = 0; i < sorted_category.length; i++) {
-            if(sorted_category[i] !== 'null') {
-                var html = '<tr class="category category_' + a + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';
-                $('.get_test_data').append(html);
+            table_data.push(sorted_category[i]);
 
-                a = a + 1;
-            }
-
-        }
-
-        if($.inArray('null', sorted_category)) {
-            var html_null = '<tr class="category category_' + sorted_category.length + '"><td class="negative" colspan="3">' + '정의 되지 않음' + '</td></tr>';
-            $('.get_test_data').append(html_null);
-        }
-
-        for(var j = 0; j < get_test.length; j++) {
-            if(get_test[j].category === null) {
-                get_test[j].category = '정의 되지 않음';
-            }
-
-            $('.category').each(function(k) {
-                if(get_test[j].category == $(this).find('.negative').text()) {
-
-                    if(get_test[j].category != 'null') {
-                        var selector = '.category_' + (k + 1);
-                    }
-
-                    if(get_test[j].component === null) {
-                        get_test[j].component = '';
-                    }
-
-                    if(get_test[j].evaluation === null || get_test[j].evaluation == 'normal') {
-                        get_test[j].evaluation = '';
-                    }else if(get_test[j].evaluation == 'high') {
-                        get_test[j].evaluation = 'H';
-                    }else if(get_test[j].evaluation == 'low') {
-                        get_test[j].evaluation = 'L';
-                    }
-
-                    var b = '';
-                    if(get_test[j].evaluation == 'H' || get_test[j].evaluation == 'L') {
-                        b = 'style="background-color: red; color: white;"';
-                    }else {
-                        b = 'class="warning"';
-                    }
-
-                    var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td ' + b + '>' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';
-
-
-
-
-
-                    $(html2).insertAfter(selector);
+            for(var j = 0; j < data.test_data.tests.length; j++) {
+                if(get_test[j].category == sorted_category[i]){
+                    table_data.push(get_test[j]);
                 }
-            });
-
+            }
         }
+
+        var cnt_row = Math.ceil(table_data.length / 4);
+
+        for(var i = 0; i < cnt_row - 1; i++) {
+            if(jQuery.type(table_data[i]) == 'string') {
+                var table_col1 = '<tr><td  class="negative" colspan="3">' + table_data[i] + '</td>';
+            }else {
+                if(table_data[i].evaluation == 'high') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'H';
+                }else if(table_data[i].evaluation == 'low') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'L';
+                }else {
+                    var css_value = '';
+                    var evaluation = '';
+                }
+
+                var table_col1 = '<tr><td class="positive">' + table_data[i].component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
+            }
+
+            if(jQuery.type(table_data[i + cnt_row]) == 'string') {
+                var table_col2 = '<td class="negative" colspan="3">' + table_data[i + cnt_row] + '</td>';
+            }else {
+                if(table_data[i + cnt_row].evaluation == 'high') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'H';
+                }else if(table_data[i + cnt_row].evaluation == 'low') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'L';
+                }else {
+                    var css_value = 'class="warning"';
+                    var evaluation = '';
+                }
+
+                var table_col2 = '<td class="positive">' + table_data[i + cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
+            }
+
+            if(jQuery.type(table_data[i + 2 * cnt_row]) == 'string') {
+                var table_col3 = '<td class="negative" colspan="3">' + table_data[i + 2 * cnt_row] + '</td>';
+            }else {
+                if(table_data[i + 2 * cnt_row].evaluation == 'high') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'H';
+                }else if(table_data[i + 2 * cnt_row].evaluation == 'low') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'L';
+                }else {
+                    var css_value = 'class="warning"';
+                    var evaluation = '';
+                }
+
+                var table_col3 = '<td class="positive">' + table_data[i + 2 * cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
+            }
+
+            if(jQuery.type(table_data[i + 3 * cnt_row]) == 'string') {
+                var table_col4 = '<td class="negative" colspan="3">' + table_data[i + 3 * cnt_row] + '</td></tr>';
+            }else {
+                if(table_data[i + 3 * cnt_row].evaluation == 'high') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'H';
+                }else if(table_data[i + 3 * cnt_row].evaluation == 'low') {
+                    var css_value = 'style="background-color: red; color: white;"';
+                    var evaluation = 'L';
+                }else {
+                    var css_value = 'class="warning"';
+                    var evaluation = '';
+                }
+
+                var table_col4 = '<td class="positive">' + table_data[i + 3 * cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
+            }
+
+            var table = table_col1 + table_col2 + table_col3 + table_col4;
+
+            $('.get_test_data').append(table);
+        }
+        <!--var a = 1;-->
+        <!--for(var i = 0; i < sorted_category.length; i++) {-->
+            <!--if(sorted_category[i] !== 'null') {-->
+                <!--var html = '<tr class="category category_' + a + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';-->
+                <!--$('.get_test_data').append(html);-->
+
+                <!--a = a + 1;-->
+            <!--}-->
+
+        <!--}-->
+
+        <!--if($.inArray('null', sorted_category)) {-->
+            <!--var html_null = '<tr class="category category_' + sorted_category.length + '"><td class="negative" colspan="3">' + '정의 되지 않음' + '</td></tr>';-->
+            <!--$('.get_test_data').append(html_null);-->
+        <!--}-->
+
+        <!--for(var j = 0; j < get_test.length; j++) {-->
+            <!--if(get_test[j].category === null) {-->
+                <!--get_test[j].category = '정의 되지 않음';-->
+            <!--}-->
+
+            <!--$('.category').each(function(k) {-->
+                <!--if(get_test[j].category == $(this).find('.negative').text()) {-->
+
+                    <!--if(get_test[j].category != 'null') {-->
+                        <!--var selector = '.category_' + (k + 1);-->
+                    <!--}-->
+
+                    <!--if(get_test[j].component === null) {-->
+                        <!--get_test[j].component = '';-->
+                    <!--}-->
+
+                    <!--if(get_test[j].evaluation === null || get_test[j].evaluation == 'normal') {-->
+                        <!--get_test[j].evaluation = '';-->
+                    <!--}else if(get_test[j].evaluation == 'high') {-->
+                        <!--get_test[j].evaluation = 'H';-->
+                    <!--}else if(get_test[j].evaluation == 'low') {-->
+                        <!--get_test[j].evaluation = 'L';-->
+                    <!--}-->
+
+                    <!--var b = '';-->
+                    <!--if(get_test[j].evaluation == 'H' || get_test[j].evaluation == 'L') {-->
+                        <!--b = 'style="background-color: red; color: white;"';-->
+                    <!--}else {-->
+                        <!--b = 'class="warning"';-->
+                    <!--}-->
+
+                    <!--var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td ' + b + '>' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';-->
+
+
+
+
+
+                    <!--$(html2).insertAfter(selector);-->
+                <!--}-->
+            <!--});-->
+
+        <!--}-->
     }
 
 
@@ -286,13 +373,13 @@
         </div>
         <div class="fourteen wide column">
             <div class="ui grid">
-                    <div class="ui segment six wide column" style="height: 700px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
+                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
                         <table class="ui compact padded center aligned table">
                             <tbody class="get_test_data">
                             </tbody>
                         </table>
                     </div>
-                    <div class="ui eight wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
+                    <div class="ui four wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
