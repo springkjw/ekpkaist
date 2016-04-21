@@ -4,14 +4,19 @@ import json
 import urllib
 import urllib2
 
-def book_list(request, keyword, page):
+def book_list(request, keyword, page, rel):
     page_first = int(page) * 6  - 5
     page_last = int(page) * 6
 
     keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
+    if rel == 'none':
+        url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
+    else:
+        rel_quote = urllib.quote_plus(rel.encode('utf-8'))
+        url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last) + "&rel=" + rel_quote
 
-    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
     url_paper = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
+
 
     query = urllib2.urlopen(url).read()
     query_paper = urllib2.urlopen(url_paper).read()
@@ -45,12 +50,13 @@ def book_list(request, keyword, page):
         "count_1" : (count_data[0]) * 10,
         "count_2" : (count_data[0] + 1) * 10,
         "page" : int(page),
-        "keyword" : keyword
+        "keyword" : keyword,
+        "rel" : rel
     }
 
     return render(request, template, context)
 
-def book_detail(request, keyword, num):
+def book_detail(request, keyword, num, rel):
 
     keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
 
@@ -66,7 +72,8 @@ def book_detail(request, keyword, num):
     context = {
         "object" : serialized_obj,
         "keyword" : keyword,
-        "page" : page
+        "page" : page,
+        "rel" : rel
     }
 
     return render(request, template, context)

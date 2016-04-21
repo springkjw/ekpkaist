@@ -5,7 +5,6 @@
     <div class="ui main container">
         <div class="ui center aligned">
             {% for obj in object.topics %}
-                <!--<a href="{% url 'book_list' keyword=obj.topic_title page=1 %}" class="ui label" style="margin: 5px;">-->
                 <a href="#" class="ui label" style="margin: 5px;">
                     <span class="keyword">{{ obj.topic_title }}</span>
                     <i class="delete icon"></i>
@@ -44,7 +43,7 @@
             </div>
         </div>
         <div class="ui top attached tabular menu">
-            <a class="item" data-tab="book" href="{% url 'book_list' keyword=keyword page=1 %}">Book ({{ book.total_doc }})</a>
+            <a class="item" data-tab="book" href="{% url 'book_list' keyword=keyword page=1 rel='none' %}">Book ({{ book.total_doc }})</a>
             <a class="active item" data-tab="article">Article ({{ object.total_doc }})</a>
         </div>
         <div class="ui bottom attached active tab segment">

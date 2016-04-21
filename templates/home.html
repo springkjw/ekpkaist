@@ -2,353 +2,30 @@
 {% load staticfiles %}
 
 {% block javascript %}
-    $(function() {
-        var now = new Date();
-        $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-
-        $('tbody.patient_info tr').on('click', function() {
-            if($(this).hasClass('active')) {
-                $(this).removeClass('active');
-            }else {
-                $(this).parent().children().removeClass('active');
-                $(this).addClass('active');
-
-                var data_id = $(this).attr('data-id');
-
-                $.ajax({
-                    url : '/',
-                    data : {
-                        id: data_id
-                    },
-                    success : function(data) {
-                        var record_date = data.patient_data.recorded_date;
-                        var hospital = data.patient_data.clinic.name;
-                        var office = data.patient_data.office.name;
-                        var receipt_num = data.patient_data.receipt_number;
-                        var name = data.patient_data.patient.name;
-                        var sex;
-                        if(data.patient_data.patient.sex == 'male') {
-                            sex = '남';
-                        }else {
-                            sex = '여';
-                        }
-                        var age = data.patient_data.patient.age;
-
-                        $('.record_date_data').val(record_date);
-                        $('.hospital_data').val(hospital);
-                        $('.office_data').val(office);
-                        $('.receipt_num_data').val(receipt_num);
-                        $('.name_data').val(name);
-                        $('.sex_data').val(sex);
-                        $('.age_data').val(age);
-
-                        getTest(data);
-                        conclusion(data);
-                    }
-                });
-            }
-        });
-
-        $('.conclusion').on('click', '.conclusion_content .content', function() {
-            if(!$(this).parent().hasClass('active')){
-                $(this).parent().parent().children().removeClass('active');
-                $(this).parent().addClass('active');
-
-                var data_rule_id = $(this).parent().attr('data-rule-id');
-                var data_text = $(this).parent().attr('data-text');
-
-                var url = 'books/' + data_text + '/page=1';
-
-                $('.more-book').attr('href', url);
-
-                $.ajax({
-                    url : '/',
-                    data : {
-                        rule_id: data_rule_id,
-                        text : data_text
-                    },
-                    success : function(data) {
-                        ruleData(data);
-                        bookData(data);
-                    },
-                    beforeSend : function() {
-                        $('.dimmer').addClass('active');
-                    },
-                    complete : function() {
-                        $('.dimmer').removeClass('active');
-                    }
-                });
-
-            }else{
-                $(this).parent().removeClass('active');
-                $('.rule_condition').text('');
-                $('.rule_content').text('');
-                $('.topic').html('');
-                $('.book').html('');
-            };
-        });
-
-        $('.conclusion').on('click', '#is_print', function() {
-            if(!$(this).is(":checked")) {
-                $(this).parent().parent().parent().find('.content').css('text-decoration', 'line-through');
-            }else {
-                $(this).parent().parent().parent().find('.content').css('text-decoration', '');
-            }
-        });
-
-    });
-
-    function getTest(data) {
-        var get_test = data.test_data.tests;
-        $('.get_test_data').html('');
-        var category = [];
-        var sorted_category = [];
-
-        for(var i = 0; i < get_test.length; i++) {
-            if(get_test[i].category !== null) {
-                category.push(get_test[i].category);
-            }
-        }
-
-        $.each(category, function(i, e1) {
-            if($.inArray(e1, sorted_category) === -1) {
-                sorted_category.push(e1);
-            }else{
-                if($.inArray('null' , sorted_category) === -1) {
-                    sorted_category.push('null');
-                }
-            }
-        });
-
-        $.each(category, function(i, e1) {
-            if($.inArray(e1, sorted_category) !== -1) {
-                if($.inArray('null' , sorted_category) === -1) {
-                    sorted_category.push('null');
-                }
-            }
-        });
-
-        var table_data = [];
-
-        for(var i = 0; i < sorted_category.length; i++) {
-            table_data.push(sorted_category[i]);
-
-            for(var j = 0; j < data.test_data.tests.length; j++) {
-                if(get_test[j].category == sorted_category[i]){
-                    table_data.push(get_test[j]);
-                }
-            }
-        }
-
-        var cnt_row = Math.ceil(table_data.length / 4);
-
-        for(var i = 0; i < cnt_row - 1; i++) {
-            if(jQuery.type(table_data[i]) == 'string') {
-                var table_col1 = '<tr><td  class="negative" colspan="3">' + table_data[i] + '</td>';
-            }else {
-                if(table_data[i].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'H';
-                }else if(table_data[i].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'L';
-                }else {
-                    var css_value = '';
-                    var evaluation = '';
-                }
-
-                var table_col1 = '<tr><td class="positive">' + table_data[i].component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
-            }
-
-            if(jQuery.type(table_data[i + cnt_row]) == 'string') {
-                var table_col2 = '<td class="negative" colspan="3">' + table_data[i + cnt_row] + '</td>';
-            }else {
-                if(table_data[i + cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'H';
-                }else if(table_data[i + cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'L';
-                }else {
-                    var css_value = 'class="warning"';
-                    var evaluation = '';
-                }
-
-                var table_col2 = '<td class="positive">' + table_data[i + cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
-            }
-
-            if(jQuery.type(table_data[i + 2 * cnt_row]) == 'string') {
-                var table_col3 = '<td class="negative" colspan="3">' + table_data[i + 2 * cnt_row] + '</td>';
-            }else {
-                if(table_data[i + 2 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'H';
-                }else if(table_data[i + 2 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'L';
-                }else {
-                    var css_value = 'class="warning"';
-                    var evaluation = '';
-                }
-
-                var table_col3 = '<td class="positive">' + table_data[i + 2 * cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
-            }
-
-            if(jQuery.type(table_data[i + 3 * cnt_row]) == 'string') {
-                var table_col4 = '<td class="negative" colspan="3">' + table_data[i + 3 * cnt_row] + '</td></tr>';
-            }else {
-                if(table_data[i + 3 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'H';
-                }else if(table_data[i + 3 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
-                    var evaluation = 'L';
-                }else {
-                    var css_value = 'class="warning"';
-                    var evaluation = '';
-                }
-
-                var table_col4 = '<td class="positive">' + table_data[i + 3 * cnt_row].component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
-            }
-
-            var table = table_col1 + table_col2 + table_col3 + table_col4;
-
-            $('.get_test_data').append(table);
-        }
-        <!--var a = 1;-->
-        <!--for(var i = 0; i < sorted_category.length; i++) {-->
-            <!--if(sorted_category[i] !== 'null') {-->
-                <!--var html = '<tr class="category category_' + a + '"><td class="negative" colspan="3">' + sorted_category[i] + '</td></tr>';-->
-                <!--$('.get_test_data').append(html);-->
-
-                <!--a = a + 1;-->
-            <!--}-->
-
-        <!--}-->
-
-        <!--if($.inArray('null', sorted_category)) {-->
-            <!--var html_null = '<tr class="category category_' + sorted_category.length + '"><td class="negative" colspan="3">' + '정의 되지 않음' + '</td></tr>';-->
-            <!--$('.get_test_data').append(html_null);-->
-        <!--}-->
-
-        <!--for(var j = 0; j < get_test.length; j++) {-->
-            <!--if(get_test[j].category === null) {-->
-                <!--get_test[j].category = '정의 되지 않음';-->
-            <!--}-->
-
-            <!--$('.category').each(function(k) {-->
-                <!--if(get_test[j].category == $(this).find('.negative').text()) {-->
-
-                    <!--if(get_test[j].category != 'null') {-->
-                        <!--var selector = '.category_' + (k + 1);-->
-                    <!--}-->
-
-                    <!--if(get_test[j].component === null) {-->
-                        <!--get_test[j].component = '';-->
-                    <!--}-->
-
-                    <!--if(get_test[j].evaluation === null || get_test[j].evaluation == 'normal') {-->
-                        <!--get_test[j].evaluation = '';-->
-                    <!--}else if(get_test[j].evaluation == 'high') {-->
-                        <!--get_test[j].evaluation = 'H';-->
-                    <!--}else if(get_test[j].evaluation == 'low') {-->
-                        <!--get_test[j].evaluation = 'L';-->
-                    <!--}-->
-
-                    <!--var b = '';-->
-                    <!--if(get_test[j].evaluation == 'H' || get_test[j].evaluation == 'L') {-->
-                        <!--b = 'style="background-color: red; color: white;"';-->
-                    <!--}else {-->
-                        <!--b = 'class="warning"';-->
-                    <!--}-->
-
-                    <!--var html2 = '<tr><td class="ui inverted teal">' + get_test[j].component + '</td><td ' + b + '>' + get_test[j].value + '</td><td class="positive">' + get_test[j].evaluation + '</td></tr>';-->
-
-
-
-
-
-                    <!--$(html2).insertAfter(selector);-->
-                <!--}-->
-            <!--});-->
-
-        <!--}-->
-    }
-
-
-    function conclusion(data) {
-        var conclusion = data.conclusion.conclusions;
-        $('.conclusion').html('');
-
-        for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
-
-            $('.conclusion').append(html3);
-        }
-    }
-
-    function ruleData(data) {
-        var condition = data.rule.conditions;
-        var conclusion = data.rule.conclusion;
-        $('.rule_condition').html('');
-        $('.rule_content').html('');
-
-        for(var i = 0; i < condition.length; i++) {
-            var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
-            if(i != condition.length - 1) {
-                html4 += '<br/>&&<br/>';
-            }
-
-            $('.rule_condition').append(html4);
-        }
-
-        $('.rule_content').append(conclusion);
-    }
-
-    function bookData(data) {
-        $('.topic').html('');
-        $('.book').html('');
-        var book = data.book
-        var topic = book.topics;
-        var books = book.books;
-
-        for(var i = 0; i < topic.length; i++) {
-            var html5 = '<a href="#" class="ui label" style="margin: 5px;"><span class="keyword">' + topic[i].topic_title + '</span></a>';
-
-            $('.topic').append(html5);
-        }
-
-        for(var j = 0; j < books.length; j++) {
-            var html6 = '<div class="item"><img class="ui middle aligned tiny image" src="' + books[j].book_image_url + '" style="max-height: 100px;"><div class="middle aligned content"><a class="header" href="#">' + books[j].book_source + '</a><div class="metadata"><strong class="date">' + books[j].book_year + '</strong> by <span class="description">' + books[j].book_author + '</span></div><div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">' + books[j].book_highlighted_contents + '</div></div></div>';
-
-            $('.book').append(html6);
-        }
-
-    }
-
+    <script type="text/javascript" src="{% static 'js/home.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <div class="ui main" style="margin: 0 10px 0 10px;">
     <h2>종합보기</h2>{{ patient_data.cases.recorded_date }}
-    <div class="ui grid ">
-        <div class="sixteen wide column">
+    <div class="ui  grid ">
+        <div class="sixteen column">
             <table class="ui table">
                 <tr>
-                    <td class="active two wide center aligned"><strong>환자 정보</strong></td>
-                    <td class="current two wide center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="active two   center aligned"><strong>환자 정보</strong></td>
+                    <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
                     <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="hospital two wide center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="ofiice two wide center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="receipt_num two wide center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="name two wide center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="sex one wide center aligned">성별 - <input class="sex_data ui basic label center aligned fluid" readonly value="   " /></td>
-                    <td class="age one wide center aligned">나이 - <input class="age_data ui basic label center aligned fluid" readonly value="   " /></td>
+                    <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="receipt_num two  center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="name two  center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="sex one  center aligned">성별 - <input class="sex_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="age one  center aligned">나이 - <input class="age_data ui basic label center aligned" readonly value="   " /></td>
                 </tr>
             </table>
         </div>
     </div>
-    <div class="ui grid">
+    <div class="ui relaxed grid">
         <div class="two wide column" style="height:900px; overflow:scroll;">
             <table class="ui compact  center aligned table">
                 <thead>
@@ -372,8 +49,8 @@
             </table>
         </div>
         <div class="fourteen wide column">
-            <div class="ui grid">
-                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; margin-right: 20px; overflow:scroll;">
+            <div class="ui relaxed grid">
+                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;">
                         <table class="ui compact padded center aligned table">
                             <tbody class="get_test_data">
                             </tbody>
@@ -383,15 +60,22 @@
                         <table class="ui padded table">
                             <thead>
                                 <tr>
-                                    <th class="twelve wide">소견 내용</th>
-                                    <th class="four wide ui right aligned">출력</th>
+                                    <th class="eleven wide">소견 내용</th>
+                                    <th class="five wide ui center aligned" colspan="2">출력</th>
                                 </tr>
                             </thead>
                             <tbody class="conclusion">
                             </tbody>
                         </table>
                     </div>
-                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; overflow:scroll; padding: 0;">
+                    <div class="ui two wide column">
+                        <div class="ui segment">
+                            <button class="tiny ui  button">최종확인</button>
+                            <div class="ui divider"></div>
+                            <button class="fluid tiny ui  button">최종 소견 미리보기</button>
+                        </div>
+                    </div>
+                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
                         <table class="ui celled padded fixed table">
                             <thead>
                                 <tr>

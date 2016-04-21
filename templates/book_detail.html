@@ -5,7 +5,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/book_detail.css' %}">
 {% endblock %}
 {% block javascript %}
-    function click_previous() {
+
+{% endblock %}
+
+{% block content %}
+    <script type="text/javascript">
+        function click_previous() {
         if($('button.next').hasClass('active')) {
             $('button.next').removeClass('active');
             $('.next').removeClass('active');
@@ -25,14 +30,13 @@
             $('.current').removeClass('active');
         }
     }
-{% endblock %}
+    </script>
 
-{% block content %}
     <div class="ui main container">
         {% for item in object.books %}
             <div class="ui">
                 <div class="ui breadcrumb" style="margin-top: 20px;">
-                    <div class="section"><strong>Search for: </strong><a class="section" href="{% url 'book_list' keyword=keyword page=page %}">{{ keyword }}</a></div>
+                    <div class="section"><strong>Search for: </strong><a class="section" href="{% url 'book_list' keyword=keyword page=page rel=rel %}">{{ keyword }}</a></div>
                     <span class="divider">/</span>
                     <div class="active section">{{ item.book_source }}</div>
                 </div>

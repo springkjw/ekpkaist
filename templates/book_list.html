@@ -2,41 +2,72 @@
 {% load staticfiles %}
 
 {% block javascript %}
-    var content = [
-    ];
+    <script type="text/javascript" src="{% static 'js/book_list.js' %}"></script>
 
-    {% for obj in object.keywords %}
-        content.push({ title : '{{ obj.keyword_title }}'});
-    {% endfor %}
-
-    $(function() {
-        $('.ui.dropdown').dropdown();
-
-        $('.delete').on('click', function() {
-            var keyword = $(this).parent().find('.keyword').text();
-            $(this).parent().hide();
-        });
-
-        $('.ui.search').search({
-            source: content
-        });
-    });
-
-    function button_click() {
-        var data = $('.prompt').val();
-
-        if(data == '') {
-            alert("검색어를 입력해주세요.");
-            return;
-        }
-
-        var url = '/books/' + data + '/page=1';
-
-        $(location).attr('href', url);
-    }
 {% endblock %}
 
 {% block content %}
+    <script type="text/javascript">
+        var content = [];
+
+        {% for obj in object.topics %}
+            content.push({ title : '{{ obj.topic_title }}'});
+        {% endfor %}
+
+        $(function() {
+            $('.ui.dropdown .item').each(function() {
+                if($(this).text() == '{{ rel }}' ){
+                    $(this).parent().parent().addClass('selection');
+                    $(this).attr('data-value', 'default');
+                }
+            });
+            $('.ui.dropdown').dropdown('restore defaults');
+
+            $('.ui.dropdown').dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    window.location.href = "{% url 'book_list' keyword=keyword page=1 rel='' %}" + text;
+                }
+            });
+
+            $('.delete').on('click', function() {
+                var keyword = $(this).parent().find('.keyword').text();
+                var search;
+                $(this).parent().hide();
+                for(var i = 0; i < content.length; i++) {
+                    if(content[i].title !== keyword) {
+                        search += " " + content[i].title;
+                    }
+                }
+                window.location.href = "/books/" + search + "/page=" + '{{ page }}' + "/rel=" + '{{ rel }}';
+            });
+
+            $('.ui.search').search({
+                source: content
+            });
+        });
+
+        function button_click() {
+            var data = $('.prompt').val();
+
+            if(data == '') {
+                alert("검색어를 입력해주세요.");
+                return;
+            }
+
+            var search;
+            for(var i = 0; i < content.length; i++) {
+                search += " " + content[i].title;
+            }
+
+            search += " " + data;
+
+            var url = '/books/' + search + '/page=1/rel=' + '{{ rel }}';
+
+            $(location).attr('href', url);
+        }
+    </script>
+
+
     <div class="ui main container">
         <div class="ui center aligned">
             {% for obj in object.topics %}
@@ -62,17 +93,23 @@
                 <div class="ui selection dropdown">
                     <input type="hidden" name="정렬기준">
                     <i class="dropdown icon"></i>
-                    <div class="default text">정렬 기준</div>
+                    <div class="text">
+                        {% if rel == 'none' %}
+                            정렬 기준
+                        {% else %}
+                            {{ rel }}
+                        {% endif %}
+                    </div>
                     <div class="menu">
-                        <div class="item" data-value="1">관찰값</div>
-                        <div class="item" data-value="0">개체간 영향</div>
-                        <div class="item" data-value="0">설명, 사실</div>
-                        <div class="item" data-value="0">행동</div>
-                        <div class="item" data-value="0">이유</div>
-                        <div class="item" data-value="0">상태변화</div>
-                        <div class="item" data-value="0">추론 과정</div>
-                        <div class="item" data-value="0">치료법</div>
-                        <div class="item" data-value="0">진단법</div>
+                        <div class="item" data-value="0">관찰값</div>
+                        <div class="item" data-value="1">개체간 영향</div>
+                        <div class="item" data-value="2">설명, 사실</div>
+                        <div class="item" data-value="3">행동</div>
+                        <div class="item" data-value="4">이유</div>
+                        <div class="item" data-value="5">상태변화</div>
+                        <div class="item" data-value="6">추론 과정</div>
+                        <div class="item" data-value="7">치료법</div>
+                        <div class="item" data-value="8">진단법</div>
                     </div>
                 </div>
             </div>
@@ -87,7 +124,7 @@
                     <div class="item">
                         <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
                         <div class="middle aligned content">
-                            <a class="header" href="{% url 'book_detail' keyword=keyword num=num|add:forloop.counter %}">{{ item.book_source }}</a>
+                            <a class="header" href="{% url 'book_detail' keyword=keyword num=num|add:forloop.counter rel=rel%}">{{ item.book_source }}</a>
                             <div class="metadata">
                                 <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
                             </div>
@@ -103,17 +140,17 @@
         <div class="ui column grid" style="margin:20px;">
             <div class="column">
                 {% if not count_1 == 0 %}
-                    <a href="{% url 'book_list' keyword=keyword page=count_1|add:-9 %}"><i class="chevron left icon"></i></a>
+                    <a href="{% url 'book_list' keyword=keyword page=count_1|add:-9 rel=rel %}"><i class="chevron left icon"></i></a>
                 {% endif %}
                 <div class="ui pagination menu">
                     {% for i in range %}
-                        <a href="{% url 'book_list' keyword=keyword page=i %}" class="item {% if i == page %}active{% endif %}">
+                        <a href="{% url 'book_list' keyword=keyword page=i rel=rel %}" class="item {% if i == page %}active{% endif %}">
                             {{ i }}
                         </a>
                     {% endfor %}
                 </div>
                 {% if not count_mod == count_data %}
-                    <a href="{% url 'book_list' keyword=keyword page=count_2|add:1 %}"><i class="chevron right icon"></i></a>
+                    <a href="{% url 'book_list' keyword=keyword page=count_2|add:1 rel=rel %}"><i class="chevron right icon"></i></a>
                 {% endif %}
             </div>
         </div>
