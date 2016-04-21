@@ -6,9 +6,19 @@ $(function() {
         $('tbody.patient_info tr').on('click', function() {
             if($(this).hasClass('active')) {
                 $(this).removeClass('active');
+                $('.rule_condition').text('');
+                $('.rule_content').text('');
+                $('.topic').html('');
+                $('.book').html('');
+                $('.get_test_data').html('');
+                $('.conclusion').html('');
             }else {
                 $(this).parent().children().removeClass('active');
                 $(this).addClass('active');
+                $('.rule_condition').text('');
+                $('.rule_content').text('');
+                $('.topic').html('');
+                $('.book').html('');
 
                 var data_id = $(this).attr('data-id');
 
@@ -256,7 +266,7 @@ $(function() {
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;">상세보기</button></td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
 
             $('.conclusion').append(html3);
         }

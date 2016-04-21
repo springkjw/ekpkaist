@@ -11,8 +11,6 @@ def home(request):
 
     serialized_obj = json.loads(query)
 
-
-    print request
     if request.is_ajax():
         if(request.GET.get('id', False)):
             url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id']
