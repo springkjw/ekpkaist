@@ -13,10 +13,12 @@ def book_list(request, keyword, page, rel):
         url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
     else:
         rel_quote = urllib.quote_plus(rel.encode('utf-8'))
-        url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last) + "&rel=" + rel_quote
+        url = "http://ekp.kaist.ac.kr/apis/getBooksbyCLI?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last) + "&rel=" + rel_quote
 
     url_paper = "http://ekp.kaist.ac.kr/apis/getPapers?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
 
+
+    print url
 
     query = urllib2.urlopen(url).read()
     query_paper = urllib2.urlopen(url_paper).read()
