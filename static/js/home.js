@@ -140,9 +140,11 @@ $(function() {
         if(is_check){
             $('.rule_conclusion').css('text-decoration', '');
             checkbox.checkbox('set checked');
+            $('tbody.conclusion .active .content').css('text-decoration', '');
         }else{
             $('.rule_conclusion').css('text-decoration', 'line-through');
             checkbox.checkbox('set unchecked');
+            $('tbody.conclusion .active .content').css('text-decoration', 'line-through');
         }
     });
 
