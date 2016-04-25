@@ -1,5 +1,11 @@
 $(function() {
-        checkForHash();
+
+
+    var data = $.persist('home');
+    if(data) {
+        $('body').html(data.html);
+    }
+
         var now = new Date();
         $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
 
@@ -67,7 +73,7 @@ $(function() {
                 var url = 'books/' + data_text + '/page=1/rel=none';
 
 
-                $('.more-book').attr('href', url);
+                $('.more-book').attr('data-url', url);
 
                 $.ajax({
                     url : '/',
@@ -78,6 +84,13 @@ $(function() {
                     success : function(data) {
                         ruleData(data);
                         bookData(data);
+
+                        var is_check = $('.conclusion .active .ui.checkbox').checkbox('is checked');
+
+                        if(!is_check) {
+                            $('.rule_content .ui.checkbox').checkbox('set unchecked');
+                            $('.rule_conclusion').css('text-decoration', 'line-through');
+                        }
                     },
                     beforeSend : function() {
                         $('.dimmer').addClass('active');
@@ -93,18 +106,56 @@ $(function() {
                 $('.rule_content').text('');
                 $('.topic').html('');
                 $('.book').html('');
-            };
-        });
-
-        $('.conclusion').on('click', '#is_print', function() {
-            if(!$(this).is(":checked")) {
-                $(this).parent().parent().parent().find('.content').css('text-decoration', 'line-through');
-            }else {
-                $(this).parent().parent().parent().find('.content').css('text-decoration', '');
             }
         });
 
+    $('.conclusion').on('click', '.ui.checkbox', function() {
+        if($(this).parent().parent().hasClass('active')){
+            var is_check = $(this).checkbox('is checked');
+
+            if(is_check) {
+                $('.rule_content .ui.checkbox').checkbox('set checked');
+                $(this).parent().parent().find('.content').css('text-decoration', '');
+                $('.rule_conclusion').css('text-decoration', '');
+            }else {
+                $('.rule_content .ui.checkbox').checkbox('set unchecked');
+                $(this).parent().parent().find('.content').css('text-decoration', 'line-through');
+                $('.rule_conclusion').css('text-decoration', 'line-through');
+            }
+        }else {
+            var is_check = $(this).checkbox('is checked');
+
+            if(is_check) {
+                $(this).parent().parent().find('.content').css('text-decoration', '');
+            }else {
+                $(this).parent().parent().find('.content').css('text-decoration', 'line-through');
+            }
+        }
     });
+
+    $('.rule_content').on('click', '.ui.checkbox', function() {
+        var is_check = $(this).checkbox('is checked');
+        var checkbox = $('tbody.conclusion .active .right .checkbox');
+
+        if(is_check){
+            $('.rule_conclusion').css('text-decoration', '');
+            checkbox.checkbox('set checked');
+        }else{
+            $('.rule_conclusion').css('text-decoration', 'line-through');
+            checkbox.checkbox('set unchecked');
+        }
+    });
+
+
+    $('.more-book').on('click', function() {
+        $.persist('home', {
+            "html" : $('body').html()
+        });
+        window.location.href = $(this).attr('data-url');
+    });
+
+
+});
 
     function getTest(data) {
         var get_test = data.test_data.tests;
@@ -266,7 +317,7 @@ $(function() {
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"></div></td></tr>';
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div id="is_print" class="ui checkbox"><input type="checkbox" name="print" checked=""><label></label></div></td></tr>';
 
             $('.conclusion').append(html3);
         }
@@ -288,7 +339,7 @@ $(function() {
             $('.rule_condition').append(html4);
         }
 
-        var content_conclusion = conclusion + '<br/><br/><button class="tiny ui button">현재 Rule 편집</button>&nbsp;&nbsp;&nbsp;<div class="ui checked checkbox"><input type="checkbox" id="is_print" name="print" checked="" style="opacity: 1 !important;"><label>출력</label></div>';
+        var content_conclusion = '<span class="rule_conclusion">' + conclusion + '</span><br/><br/><button class="tiny ui button">현재 Rule 편집</button>&nbsp;&nbsp;&nbsp;<div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label>출력</label></div>';
 
         $('.rule_content').append(content_conclusion);
     }
@@ -313,9 +364,3 @@ $(function() {
         }
 
     }
-
-function checkForHash() {
-    if(document.location.hash){
-        //var str_hash
-    }
-}

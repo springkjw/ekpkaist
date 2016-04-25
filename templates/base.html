@@ -6,12 +6,15 @@
     <title>EKP-KAIST{% block title %}{% endblock %}</title>
 
     <script type="text/javascript" src="{% static 'js/jquery-2.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/pkgd/eg.pkgd.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'Semantic-UI-CSS-master/semantic.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Semantic-UI-CSS-master/components/checkbox.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
     {% block javascript %}
     {% endblock %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-CSS-master/semantic.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Semantic-UI-CSS-master/components/checkbox.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block css %}
     {% endblock %}
