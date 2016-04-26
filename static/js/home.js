@@ -245,8 +245,8 @@ $(function() {
                     var evaluation = '';
                 }
                 var component;
-                if(table_data[i].component === null) {
-                    component = table_data[i].name;
+                if(table_data[i + cnt_row].component === null) {
+                    component = table_data[i + cnt_row].name;
                     if(/-/i.test(component)){
                         component = component.split('-')[1];
                     }
@@ -270,8 +270,8 @@ $(function() {
                     var evaluation = '';
                 }
                 var component;
-                if(table_data[i].component === null) {
-                    component = table_data[i].name;
+                if(table_data[i + 2 * cnt_row].component === null) {
+                    component = table_data[i + 2 * cnt_row].name;
                     if(/-/i.test(component)){
                         component = component.split('-')[1];
                     }
@@ -296,13 +296,13 @@ $(function() {
                     var evaluation = '';
                 }
                 var component;
-                if(table_data[i].component === null) {
-                    component = table_data[i].name;
+                if(table_data[i + 3 * cnt_row].component === null) {
+                    component = table_data[i + 3 * cnt_row].name;
                     if(/-/i.test(component)){
                         component = component.split('-')[1];
                     }
                 }else{
-                    component = table_data[i].component;
+                    component = table_data[i + 3 * cnt_row].component;
                 }
                 var table_col4 = '<td class="positive">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
             }
