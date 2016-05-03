@@ -7,7 +7,9 @@
 
 {% block content %}
 <div class="ui main" style="margin: 0 10px 0 10px;">
-    <h2>종합보기</h2>{{ patient_data.cases.recorded_date }}
+    <a href="{% url 'home' %}" style="color: inherit;"><h2>종합보기</h2></a> / <a href="#" style="color: inherit;"><h3>상세보기</h3></a>
+    <br/>
+    <br/>
     <div class="ui  grid ">
         <div class="sixteen column">
             <table class="ui table">
@@ -70,9 +72,9 @@
                     </div>
                     <div class="ui two wide column">
                         <div class="ui segment">
-                            <button class="tiny ui  button">최종확인</button>
+                            <button class="tiny ui  button">최종확인</button><i class="large teal check circle icon"></i>
                             <div class="ui divider"></div>
-                            <button class="fluid tiny ui  button">최종 소견 미리보기</button>
+                            <button class="fluid tiny ui  button final">최종 소견 미리보기</button>
                         </div>
                     </div>
                     <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
@@ -128,6 +130,36 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+</div>
+<div class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        최종 소견
+    </div>
+    <div class="content">
+        <div class="ui grid ">
+        <div class="ten column">
+            <table class="ui table">
+                <tr>
+                    <td class="record_date one wide center aligned">접수 일자<input type="text" class="record_date_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="hospital one center aligned">병원명<input class="hospital_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="ofiice one center aligned">영업소<input class="office_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="receipt_num one center aligned">접수번호<input class="receipt_num_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="name one center aligned">환자명<input class="name_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="sex one  center aligned">성별<input class="sex_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="age one  center aligned">나이<input class="age_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+        <div class="description">
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            닫기
         </div>
     </div>
 </div>

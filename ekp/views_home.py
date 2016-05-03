@@ -65,22 +65,36 @@ def home(request):
 
 
 
-def home_patient(request):
-    keyword = u'알부민'
-    keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
-    print keyword_quote
-    url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(10) + "&next=" + str(20)
-    url_decode = url.decode('utf-8')
+def home_patient(request, patient, rule):
+    url = 'http://kecidev.kaist.ac.kr:50000/cases?limit=30'
     query = urllib2.urlopen(url).read()
 
-    print type(url)
-    print type(url_decode)
+    serialized_obj = json.loads(query)
+
+    url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient
+    url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/tests"
+    url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/conclusions"
+    url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + rule
+    query_data = urllib2.urlopen(url_data).read()
+    query_test_data = urllib2.urlopen(url_test_data).read()
+    query_conclusion_data = urllib2.urlopen(url_conclusion_data).read()
+    query_rule_data = urllib2.urlopen(url_rule_data).read()
+
+
+    serialized_patient_data = json.loads(query_data)
+    serialized_obj_test_data = json.loads(query_test_data)
+    serialized_obj_conclusion_data = json.loads(query_conclusion_data)
+    serialized_obj_rule_data = json.loads(query_rule_data)
 
     template = 'home_patient.html'
     context = {
-        "url" : url,
-        "url_decode" : url_decode,
-        "query": query
+        "object" : serialized_obj,
+        "patient" : patient,
+        "rule_id" : int(rule),
+        "patient_data" : serialized_patient_data,
+        "conclusion" : serialized_obj_conclusion_data,
+        "rule" : serialized_obj_rule_data,
+        "test" : serialized_obj_test_data
     }
 
     return render(request, template, context)

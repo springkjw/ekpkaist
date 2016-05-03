@@ -9,7 +9,7 @@ def book_list(request, keyword, page, rel):
     page_last = int(page) * 6
 
     keyword_quote = urllib.quote_plus(keyword.encode('utf-8'))
-    if rel == 'none':
+    if rel == 'none' or rel == 'default':
         url = "http://ekp.kaist.ac.kr/apis/getBooks?q=" + keyword_quote + "&prev=" + str(page_first) + "&next=" + str(page_last)
     else:
         rel_quote = urllib.quote_plus(rel.encode('utf-8'))

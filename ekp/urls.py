@@ -20,7 +20,7 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', 'ekp.views_home.home', name='home'),
-    url(r'^patient/', 'ekp.views_home.home_patient', name='home_patient'),
+    url(r'^patient/(?P<patient>\d+)/(?P<rule>\d+)$', 'ekp.views_home.home_patient', name='home_patient'),
 
     url(r'^books/(?P<keyword>.*)/page=(?P<page>\d+)/rel=(?P<rel>.*)$', 'ekp.views.book_list', name='book_list'),
     url(r'^papers/(?P<keyword>.*)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),

@@ -1,12 +1,283 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block javascript %}
+    <script type="text/javascript" src="{% static 'js/home_detail.js' %}"></script>
+{% endblock %}
 
 {% block content %}
+<script type="text/javascript">
+    $(function() {
+        $('.patient_info tr').each(function() {
+            if($(this).attr('data-id') == '{{ patient }}') {
+               $(this).addClass('active');
+            }
+        });
 
-{{ query }}<br/>
+        var now = new Date();
+        $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+        $('.record_date_data').val('{{patient_data.recorded_date}}');
+        $('.hospital_data').val('{{patient_data.clinic.name}}');
+        $('.office_data').val('{{patient_data.office.name}}');
+        $('.receipt_num_data').val('{{patient_data.receipt_number}}');
+        $('.name_data').val('{{patient_data.patient.name}}');
+        var sex;
+        if('{{patient_data.patient.sex}}' == 'male') {
+            sex = '남';
+        }else {
+            sex = '여';
+        }
+        $('.sex_data').val(sex);
+        $('.age_data').val('{{patient_data.patient.age}}');
 
+    });
+</script>
+<div class="ui main" style="margin: 0 10px 0 10px;">
+    <a href="{% url 'home' %}" style="color: inherit;"><h3>종합보기</h3></a> / <a href="#" style="color: inherit;"><h2>상세보기</h2></a>
+    <br/>
+    <br/>
+    <div class="ui  grid ">
+        <div class="sixteen column">
+            <table class="ui table">
+                <tr>
+                    <td class="active two   center aligned"><strong>환자 정보</strong></td>
+                    <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="receipt_num two  center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="name two  center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="sex one  center aligned">성별 - <input class="sex_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="age one  center aligned">나이 - <input class="age_data ui basic label center aligned" readonly value="   " /></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="ui relaxed grid">
+        <div class="two wide column" style="height:900px; overflow:scroll;">
+            <table class="ui compact  center aligned table">
+                <thead>
+                    <tr>
+                        <th class="ten wide">접수일자</th>
+                        <th class="six wide">접수번호</th>
+                        <th class="six wide">환자명</th>
+                        <th class="six wide">병원명</th>
+                    </tr>
+                </thead>
+                <tbody class="patient_info">
+                    {% for item in object.cases %}
+                        <tr data-id="{{ item.id }}">
+                            <td>{{ item.recorded_date }}</td>
+                            <td>{{ item.receipt_number }}</td>
+                            <td>{{ item.patient.name }}</td>
+                            <td>{{ item.clinic.name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="fourteen wide column">
+            <div class="ui relaxed grid">
+                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;">
+                        <div class="ui grid">
+                            <div class="eight wide column">
+                                {% for item in rule.conditions %}
+                                    {% for obj in test.tests %}
+                                        {% if obj.component == item.component %}
+                                            <table class="ui celled table">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="3">
+                                                            {{ obj.category }}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {{ obj.component }}
+                                                        </td>
+                                                        <td>
+                                                            {{ obj.value }}
+                                                        </td>
+                                                        <td>
+                                                            {{ obj.evaluation }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <div class="eight wide column">
 
-{{ url }}<br/>
+                            </div>
+                        </div>
+                        <div class="ui divider"></div>
+                        <div class="ui grid">
+                            <div class="six wide column">
+                                <div class="ui segments">
+                                    <div class="ui tertiary inverted segment">
+                                        검사 결과 조건
+                                    </div>
+                                    <div class="ui segment">
+                                        {% for item in rule.conditions %}
+                                            {{ item.component }} {{ item.operator }} {{ item.value }}
+                                            <div class="ui divider"></div>
+                                        {% endfor %}
+                                        <a>Remark</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ten wide column">
+                                <div class="ui segments">
+                                    <div class="ui tertiary inverted segment">
+                                         소건 내용
+                                    </div>
+                                    <div class="ui segment">
+                                        {{ rule.conclusion.text }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui four wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
+                        <table class="ui padded table">
+                            <thead>
+                                <tr>
+                                    <th class="eleven wide">소견 내용</th>
+                                    <th class="five wide ui center aligned" colspan="2">출력</th>
+                                </tr>
+                            </thead>
+                            <tbody class="conclusion">
+                                {% for item in conclusion.conclusions %}
+                                    {% if item.id == rule_id %}
+                                        <tr class="conclusion_content active" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
+                                            <td class="content">
+                                                {{item.text}}
+                                            </td>
+                                            <td>
+                                                <button class="teal mini ui button" style="display:block;">종합보기</button><br/>
+                                                <button class="teal mini ui button" style="display:block;">현재 Rule 편집</button>
+                                            </td>
+                                            <td class="ui right aligned">
+                                                <div id="is_print" class="ui checkbox">
+                                                    <input type="checkbox" name="print" checked=""><label></label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="conclusion_content" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
+                                            <td class="content">
+                                                {{item.text}}
+                                            </td>
+                                            <td>
+                                                <button class="teal mini ui button" style="display:none;">종합보기</button><br/>
+                                                <button class="teal mini ui button" style="display:none;">현재 Rule 편집</button>
+                                            </td>
+                                            <td class="ui right aligned">
+                                                <div id="is_print" class="ui checkbox">
+                                                    <input type="checkbox" name="print" checked=""><label></label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ui two wide column">
+                        <div class="ui segment">
+                            <button class="tiny ui  button">최종확인</button><i class="large teal check circle icon"></i>
+                            <div class="ui divider"></div>
+                            <button class="fluid tiny ui  button final">최종 소견 미리보기</button>
+                        </div>
+                    </div>
+                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
+                        <table class="ui celled padded fixed table">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">소견 생성 규칙</th>
+                                </tr>
+                                <tr class="center aligned">
+                                    <th>- 검사 결과 조건</th>
+                                    <th>- 소견 내용</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="height: 100%;">
+                                    <td class="rule_condition center aligned" style="height:178px;"></td>
+                                    <td class="rule_content center aligned" style="height:178px;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="ui dimmer">
+                            <div class="ui text loader">
+                                Loading
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
+                        <table class="ui padded table">
+                            <thead>
+                                <tr>
+                                    <th>관련 의학 자료</th>
+                                    <th class="right aligned"><a href="#" class="more-book"><button class="ui button">더 알아보기</button></a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="height: 40px;">
+                                    <td colspan="2" class="topic"></td>
+                                </tr>
+                                <tr style="height: 280px;">
+                                    <td colspan="2">
+                                        <div class="ui divided items book">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="ui dimmer">
+                            <div class="ui text loader">
+                                Loading
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-{{ url_decode }}
-
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        최종 소견
+    </div>
+    <div class="content">
+        <div class="ui grid ">
+        <div class="ten column">
+            <table class="ui table">
+                <tr>
+                    <td class="record_date one wide center aligned">접수 일자<input type="text" class="record_date_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="hospital one center aligned">병원명<input class="hospital_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="ofiice one center aligned">영업소<input class="office_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="receipt_num one center aligned">접수번호<input class="receipt_num_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="name one center aligned">환자명<input class="name_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="sex one  center aligned">성별<input class="sex_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                    <td class="age one  center aligned">나이<input class="age_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+        <div class="description">
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            닫기
+        </div>
+    </div>
+</div>
 {% endblock %}

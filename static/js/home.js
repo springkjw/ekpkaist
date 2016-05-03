@@ -1,10 +1,12 @@
+var data_id;
+
 $(function() {
 
 
-    var data = $.persist('home');
-    if(data) {
-        $('body').html(data.html);
-    }
+    //var data = $.persist('home');
+    //if(data) {
+    //    $('body').html(data.html);
+    //}
 
         var now = new Date();
         $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
@@ -26,7 +28,7 @@ $(function() {
                 $('.topic').html('');
                 $('.book').html('');
 
-                var data_id = $(this).attr('data-id');
+                data_id = $(this).attr('data-id');
 
                 $.ajax({
                     url : '/',
@@ -150,12 +152,31 @@ $(function() {
 
 
     $('.more-book').on('click', function() {
-        $.persist('home', {
-            "html" : $('body').html()
-        });
-        window.location.href = $(this).attr('data-url');
+        //$.persist('home', {
+        //    "html" : $('body').html()
+        //});
+        var book_url = $(this).attr('data-url');
+        window.open(book_url);
     });
 
+    $('.final').on('click', function() {
+        $('.modal .description').html('');
+        var patient_name = $('.modal .name_data').val();
+        var final_conclusion_html_title = '<br/><p>' + patient_name + '님의 검진 결과는 다음과 같습니다.</p><br/>';
+
+        $('.modal .description').append(final_conclusion_html_title);
+        $('tbody.conclusion .conclusion_content').each(function() {
+            if($(this).find('#is_print').checkbox('is checked')) {
+                var conclusion = $(this).find('.content').text();
+
+                var final_conclusion_html = '<p>' + conclusion + '</p>';
+
+                $('.modal .description').append(final_conclusion_html);
+            }
+        });
+
+        $('.ui.modal').modal('show');
+    })
 
 });
 
@@ -319,7 +340,7 @@ $(function() {
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div id="is_print" class="ui checkbox"><input type="checkbox" name="print" checked=""><label></label></div></td></tr>';
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;" onclick="moveDetail(' + conclusion[i].id + ')">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div id="is_print" class="ui checkbox"><input type="checkbox" name="print" checked=""><label></label></div></td></tr>';
 
             $('.conclusion').append(html3);
         }
@@ -327,7 +348,7 @@ $(function() {
 
     function ruleData(data) {
         var condition = data.rule.conditions;
-        var conclusion = data.rule.conclusion;
+        var conclusion = data.rule.conclusion.text;
 
         $('.rule_condition').html('');
         $('.rule_content').html('');
@@ -335,7 +356,7 @@ $(function() {
         for(var i = 0; i < condition.length; i++) {
             var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
             if(i != condition.length - 1) {
-                html4 += '<br/>&&<br/>';
+                html4 += '<br/><div class="ui divider"></div><br/>';
             }
 
             $('.rule_condition').append(html4);
@@ -365,4 +386,10 @@ $(function() {
             $('.book').append(html6);
         }
 
+    }
+
+    function moveDetail(id) {
+        var data_conclusion_id = id;
+
+        window.location.href = '/patient/' + data_id + '/' + data_conclusion_id;
     }
