@@ -22,3 +22,14 @@ a, h1, h2, h3 {
     z-index: 500;
     margin-left:-5px;
 }
+
+.min {
+    text-align: right;
+}
+
+.mark_left {
+    position: relative;
+    z-index: 500;
+    marigin-top:35px;
+
+}

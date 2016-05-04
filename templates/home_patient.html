@@ -114,11 +114,21 @@
                                                         <td>
                                                             {{ obj.component }}
                                                         </td>
+                                                        {% if obj.evaluation == 'low' or obj.evaluation == 'high' %}
+                                                            <td style="background-color: #ff4335; color:white;">
+                                                                {{ obj.value }}
+                                                            </td>
+                                                        {% else %}
+                                                            <td>
+                                                                {{ obj.value }}
+                                                            </td>
+                                                        {% endif %}
                                                         <td>
-                                                            {{ obj.value }}
-                                                        </td>
-                                                        <td>
-                                                            {{ obj.evaluation }}
+                                                            {% if obj.evaluation == 'low' %}
+                                                                L
+                                                            {% elif obj.evaluation == 'high' %}
+                                                                H
+                                                            {% endif %}
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -220,31 +230,30 @@
                             <button class="fluid tiny ui  button final">최종 소견 미리보기</button>
                         </div>
                     </div>
-                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
-                        <table class="ui celled padded fixed table">
-                            <thead>
-                                <tr>
-                                    <th colspan="2">소견 생성 규칙</th>
-                                </tr>
-                                <tr class="center aligned">
-                                    <th>- 검사 결과 조건</th>
-                                    <th>- 소견 내용</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="height: 100%;">
-                                    <td class="rule_condition center aligned" style="height:178px;"></td>
-                                    <td class="rule_content center aligned" style="height:178px;"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="ui dimmer">
-                            <div class="ui text loader">
-                                Loading
+                    <div class="nine wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
+                        <div class="ui grid">
+                            <div class="eight wide column">
+                                <div class="ui segments">
+                                    <div class="ui tertiary inverted segment">
+                                        지표 - 진단 그래프
+                                    </div>
+                                    <div class="ui segment">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <div class="ui segments">
+                                    <div class="ui tertiary inverted segment">
+                                        비슷한 환자 사례
+                                    </div>
+                                    <div class="ui segment">
+                                        <img src="{% static 'img/case.JPG' %}" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
+                    <div class="ui segment five wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
@@ -254,11 +263,29 @@
                             </thead>
                             <tbody>
                                 <tr style="height: 40px;">
-                                    <td colspan="2" class="topic"></td>
+                                    <td colspan="2" class="topic">
+                                        {% for item in book.topics %}
+                                            <a href="#" class="ui label" style="margin: 5px;"><span class="keyword">{{ item.topic_title }}</span></a>
+                                        {% endfor %}
+                                    </td>
                                 </tr>
                                 <tr style="height: 280px;">
                                     <td colspan="2">
                                         <div class="ui divided items book">
+                                            {% for item in book.books %}
+                                                <div class="item">
+                                                    <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
+                                                    <div class="middle aligned content">
+                                                        <a class="header" href="#">{{ item.book_source }}</a>
+                                                        <div class="metadata">
+                                                            <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
+                                                        </div>
+                                                        <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
+                                                            {{ item.book_highlighted_contents|safe }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
                                         </div>
                                     </td>
                                 </tr>

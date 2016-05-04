@@ -86,6 +86,17 @@ def home_patient(request, patient, rule):
     serialized_obj_conclusion_data = json.loads(query_conclusion_data)
     serialized_obj_rule_data = json.loads(query_rule_data)
 
+    keyword_data = ''
+    for item in serialized_obj_conclusion_data["conclusions"]:
+        if item["id"] == int(rule):
+            keyword_data = item["text"]
+
+    keyword = urllib.quote_plus(keyword_data.encode('utf-8'))
+
+    url_book_data = 'http://ekp.kaist.ac.kr/apis/getBooks?q=' + keyword + "&prev=1&next=2"
+    query_book_data = urllib2.urlopen(url_book_data).read()
+    serialized_obj_book_data = json.loads(query_book_data)
+
     template = 'home_patient.html'
     context = {
         "object" : serialized_obj,
@@ -94,7 +105,8 @@ def home_patient(request, patient, rule):
         "patient_data" : serialized_patient_data,
         "conclusion" : serialized_obj_conclusion_data,
         "rule" : serialized_obj_rule_data,
-        "test" : serialized_obj_test_data
+        "test" : serialized_obj_test_data,
+        "book" : serialized_obj_book_data
     }
 
     return render(request, template, context)
