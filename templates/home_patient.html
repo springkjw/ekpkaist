@@ -30,6 +30,23 @@
         $('.sex_data').val(sex);
         $('.age_data').val('{{patient_data.patient.age}}');
 
+        $('.graph').each(function() {
+            var data_min = parseFloat($(this).find('.min').attr('data-value'));
+            var data_max = parseFloat($(this).find('.average').attr('data-value'));
+            var _data = parseFloat($(this).find('.mark').attr('data-value'));
+
+            var data_total = parseFloat(data_min + data_max);
+            var min_per = parseFloat(21 * data_min / data_total).toString() + 'em';
+            var max_per = (parseFloat(21 * data_max / data_total) - parseFloat(21 * data_min / data_total)).toString() + 'em';
+            var per = (21 - parseFloat(21 * data_max / data_total)).toString() + 'em';
+            var per_data = parseFloat(21 * _data / data_total).toString() + 'em';
+
+            $(this).find('.min').css('min-width', min_per);
+            $(this).find('.average').css('min-width', max_per);
+            $(this).find('.max').css('min-width', per);
+            $(this).find('.mark').css('padding-left', per_data);
+        });
+
     });
 </script>
 <div class="ui main" style="margin: 0 10px 0 10px;">
@@ -41,14 +58,14 @@
             <table class="ui table">
                 <tr>
                     <td class="active two   center aligned"><strong>환자 정보</strong></td>
-                    <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="receipt_num two  center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="name two  center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="sex one  center aligned">성별 - <input class="sex_data ui basic label center aligned" readonly value="   " /></td>
-                    <td class="age one  center aligned">나이 - <input class="age_data ui basic label center aligned" readonly value="   " /></td>
+                    <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="receipt_num two  center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="name two  center aligned">환자명 - <input class="name_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="sex one  center aligned">성별 - <input class="sex_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="age one  center aligned">나이 - <input class="age_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                 </tr>
             </table>
         </div>
@@ -80,10 +97,10 @@
             <div class="ui relaxed grid">
                     <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;">
                         <div class="ui grid">
-                            <div class="eight wide column">
-                                {% for item in rule.conditions %}
-                                    {% for obj in test.tests %}
-                                        {% if obj.component == item.component %}
+                            {% for item in rule.conditions %}
+                                {% for obj in test.tests %}
+                                    {% if obj.component == item.component and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
+                                        <div class="eight wide column">
                                             <table class="ui celled table">
                                                 <thead>
                                                     <tr>
@@ -106,13 +123,22 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        {% endif %}
-                                    {% endfor %}
+                                        </div>
+                                        <div class="graph eight wide column" style="margin-top: 20px;">
+                                            <div class="mark" data-value="{{ obj.value }}">
+                                                <i class="dropdown icon"></i>
+                                                <span>{{ obj.value }}</span>
+                                            </div>
+                                            <div class="min" data-value="{{ obj.low }}">
+                                            </div>
+                                            <div class="average" data-value="{{  obj.high }}">
+                                            </div>
+                                            <div class="max">
+                                            </div>
+                                        </div>
+                                    {% endif %}
                                 {% endfor %}
-                            </div>
-                            <div class="eight wide column">
-
-                            </div>
+                            {% endfor %}
                         </div>
                         <div class="ui divider"></div>
                         <div class="ui grid">

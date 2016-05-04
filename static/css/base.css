@@ -1,3 +1,24 @@
 a, h1, h2, h3 {
     display: inline;
 }
+
+.min, .average, .max {
+    position: relative;
+    min-height: 24.5px;
+    min-width: 7em;
+    float:left;
+}
+
+.min, .max {
+    background-color: #ff4335;
+}
+
+.average {
+    background-color: #66da81;
+}
+
+.mark {
+    position: relative;
+    z-index: 500;
+    margin-left:-5px;
+}
