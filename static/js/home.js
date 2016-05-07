@@ -1,12 +1,23 @@
 var data_id;
+var rule_id = '';
 
 $(function() {
 
 
-    //var data = $.persist('home');
-    //if(data) {
-    //    $('body').html(data.html);
-    //}
+        var data = $.persist('home');
+        if(data) {
+            $('body').html(data.html);
+        }
+        $('.descriptive').on('click', function() {
+            var descriptive_url = 'http://localhost:8080/rdr-web/index.htm?clientId=22&ruleId=' + rule_id;
+            window.open(descriptive_url);
+        });
+
+        $('.ui.dropdown').dropdown();
+
+        $('.ui').on('click', '.dropdown', function() {
+            $(this).dropdown();
+        });
 
         var now = new Date();
         $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
@@ -340,31 +351,86 @@ $(function() {
         $('.conclusion').html('');
 
         for(var i = 0; i < conclusion.length; i++) {
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion[i].rule_ids + '" data-text="' + conclusion[i].text + '"><td class="content">' + conclusion[i].text + '</td><td><button class="mini ui button" style="display:none;" onclick="moveDetail(' + conclusion[i].id + ')">상세보기</button><br/><button class="mini ui button" style="display:none;">현재 Rule 편집</button></td><td class="ui right aligned"><div id="is_print" class="ui checkbox"><input type="checkbox" name="print" checked=""><label></label></div></td></tr>';
+            var conclusion_rule_ids = conclusion[i].rule_ids;
+
+            if(conclusion_rule_ids.length != 1) {
+                var conclusion_rule_ids_ = '';
+                for(var j = 0; j < conclusion_rule_ids.length; j++) {
+                    if(j != conclusion_rule_ids.length -1 ) {
+                        conclusion_rule_ids_ += conclusion_rule_ids[j] + ','
+                    }else {
+                        conclusion_rule_ids_ += conclusion_rule_ids[j]
+                    }
+                }
+                conclusion_rule_ids = conclusion_rule_ids_;
+            }
+
+            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion_rule_ids + '" data-text="' + conclusion[i].text + '">' +
+                '<td class="content">' + conclusion[i].text + '</td>' +
+                    '<td>' +
+                        '<button class="mini ui button" style="display:none;" onclick="moveDetail(' + conclusion[i].id + ')">상세보기</button><br/>' +
+                        '<div class="mini ui teal top dropdown button" style="display:none">' +
+                            '현재 Rule 편집' +
+                            '<div class="menu">' +
+                                '<div class="item">편집</div>' +
+                                '<div class="item">삭제</div>' +
+                            '</div>' +
+                        '</div>'+
+                    '</td>' +
+                    '<td class="ui right aligned">' +
+                        '<div id="is_print" class="ui checkbox">' +
+                            '<input type="checkbox" name="print" checked=""><label></label>' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>';
 
             $('.conclusion').append(html3);
         }
     }
 
     function ruleData(data) {
-        var condition = data.rule.conditions;
-        var conclusion = data.rule.conclusion.text;
-
         $('.rule_condition').html('');
         $('.rule_content').html('');
 
-        for(var i = 0; i < condition.length; i++) {
-            var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
-            if(i != condition.length - 1) {
-                html4 += '<br/><div class="ui divider"></div><br/>';
+        if(data.rule.conditions) {
+            var condition = data.rule.conditions;
+            var conclusion = data.rule.conclusion.text;
+
+            for(var i = 0; i < condition.length; i++) {
+                var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
+                if(i != condition.length - 1) {
+                    html4 += '<br/>&&<br/>';
+                }
+
+                $('.rule_condition').append(html4);
             }
 
-            $('.rule_condition').append(html4);
+            var content_conclusion = '<span class="rule_conclusion">' + conclusion + '</span>';
+
+            $('.rule_content').append(content_conclusion);
+        }else {
+            for(var i = 0; i < data.rule.length; i++) {
+                for(var j = 0; j < data.rule[i].conditions.length; j++) {
+                    var html4_ = '<span>' + data.rule[i].conditions[j].component + data.rule[i].conditions[j].operator + data.rule[i].conditions[j].value + '</span>';
+                    if(j != data.rule[i].conditions.length - 1) {
+                        html4_ += '<br/>&&<br/>';
+                    }
+
+                    $('.rule_condition').append(html4_);
+                }
+
+                if(i != data.rule.length - 1) {
+                    var divider = '<div class="ui divider"></div>';
+                    $('.rule_condition').append(divider);
+                }
+            }
+
+            var conclusion_ = data.rule[0].conclusion.text;
+
+            var content_conclusion_ = '<span class="rule_conclusion">' + conclusion_ + '</span>';
+
+            $('.rule_content').append(content_conclusion_);
         }
-
-        var content_conclusion = '<span class="rule_conclusion">' + conclusion + '</span><br/><br/><button class="tiny ui button">현재 Rule 편집</button>&nbsp;&nbsp;&nbsp;<div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label>출력</label></div>';
-
-        $('.rule_content').append(content_conclusion);
     }
 
     function bookData(data) {
@@ -374,22 +440,30 @@ $(function() {
         var topic = book.topics;
         var books = book.books;
 
-        for(var i = 0; i < topic.length; i++) {
-            var html5 = '<a href="#" class="ui label" style="margin: 5px;"><span class="keyword">' + topic[i].topic_title + '</span></a>';
+        if(topic.length != 0 && books.length != 0) {
+            for (var i = 0; i < topic.length; i++) {
+                var html5 = '<a href="#" class="ui label" style="margin: 5px;"><span class="keyword">' + topic[i].topic_title + '</span></a>';
 
-            $('.topic').append(html5);
+                $('.topic').append(html5);
+            }
+
+            for (var j = 0; j < books.length; j++) {
+                var html6 = '<div class="item"><img class="ui middle aligned tiny image" src="' + books[j].book_image_url + '" style="max-height: 100px;"><div class="middle aligned content"><a class="header" href="#">' + books[j].book_source + '</a><div class="metadata"><strong class="date">' + books[j].book_year + '</strong> by <span class="description">' + books[j].book_author + '</span></div><div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">' + books[j].book_highlighted_contents + '</div></div></div>';
+
+                $('.book').append(html6);
+            }
+        }else {
+            var error_m = '<h4>데이터가 없습니다.</h4>';
+            $('.book').append(error_m);
         }
-
-        for(var j = 0; j < books.length; j++) {
-            var html6 = '<div class="item"><img class="ui middle aligned tiny image" src="' + books[j].book_image_url + '" style="max-height: 100px;"><div class="middle aligned content"><a class="header" href="#">' + books[j].book_source + '</a><div class="metadata"><strong class="date">' + books[j].book_year + '</strong> by <span class="description">' + books[j].book_author + '</span></div><div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">' + books[j].book_highlighted_contents + '</div></div></div>';
-
-            $('.book').append(html6);
-        }
-
     }
 
     function moveDetail(id) {
         var data_conclusion_id = id;
+
+        $.persist("home", {
+            "html" : $('body').html()
+        });
 
         window.location.href = '/patient/' + data_id + '/' + data_conclusion_id;
     }

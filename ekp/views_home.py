@@ -25,8 +25,6 @@ def home(request):
             serialized_obj_test_data = json.loads(query_test_data)
             serialized_obj_conclusion_data = json.loads(query_conclusion_data)
 
-
-
             context = {
                 "patient_data" : serialized_obj_data,
                 "test_data" : serialized_obj_test_data,
@@ -34,17 +32,32 @@ def home(request):
             }
             return JsonResponse(context)
         else:
-            url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
+            if ',' in request.GET['rule_id']:
+                serialized_obj_rule_data = []
+                for ids in request.GET['rule_id'].split(','):
+                    url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + ids
+                    query_rule_data = urllib2.urlopen(url_rule_data).read()
+                    serialized_obj_rule_data.append(json.loads(query_rule_data))
+            else:
+                url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
 
-            query_rule_data = urllib2.urlopen(url_rule_data).read()
-            serialized_obj_rule_data = json.loads(query_rule_data)
+                query_rule_data = urllib2.urlopen(url_rule_data).read()
+                serialized_obj_rule_data = json.loads(query_rule_data)
 
             keyword = urllib.quote_plus(request.GET['text'].encode('utf-8'))
 
-            url_book_data = 'http://ekp.kaist.ac.kr/apis/getBooks?q=' + keyword + "&prev=1&next=2"
+            try:
+                url_book_data = 'http://ekp.kaist.ac.kr/apis/getBooks?q=' + keyword + "&prev=1&next=2"
 
-            query_book_data = urllib2.urlopen(url_book_data).read()
-            serialized_obj_book_data = json.loads(query_book_data)
+                query_book_data = urllib2.urlopen(url_book_data).read()
+                serialized_obj_book_data = json.loads(query_book_data)
+            except ValueError:
+                serialized_obj_book_data = {
+                    'books': [],
+                    'keywords': [],
+                    'topics': [],
+                    'total_doc': 0
+                }
 
             context = {
                 "rule" : serialized_obj_rule_data,

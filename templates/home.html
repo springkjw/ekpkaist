@@ -62,7 +62,16 @@
                         <table class="ui padded table">
                             <thead>
                                 <tr>
-                                    <th class="eleven wide">소견 내용</th>
+                                    <th class="eleven wide">
+                                        <div class="ui grid">
+                                            <div class="eight wide column">
+                                                소견 내용
+                                            </div>
+                                            <div class="right aligned eight wide column">
+                                                <button class="tiny ui button">소견추가</button>
+                                            </div>
+                                        </div>
+                                    </th>
                                     <th class="five wide ui center aligned" colspan="2">출력</th>
                                 </tr>
                             </thead>
@@ -77,12 +86,27 @@
                             <button class="fluid tiny ui  button final">최종 소견 미리보기</button>
                         </div>
                     </div>
-                    <div class="ui segment six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
+                    <div class="ui segments six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
+                        <div class="ui secondary segment">
+                            <div class="ui grid">
+                                <div class="eight wide column">
+                                    <h4>소견 생성 규칙</h4>
+                                </div>
+                                <div class="eight wide column">
+                                    <button class="tiny ui button descriptive">Descriptive Map</button>
+                                    <div class="tiny ui top dropdown button">
+                                        현재 Rule 편집
+                                        <div class="menu">
+                                            <div class="item">편집</div>
+                                            <div class="item">삭제</div>
+                                        </div>
+                                    </div>
+                                    <div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label>출력</label></div>
+                                </div>
+                            </div>
+                        </div>
                         <table class="ui celled padded fixed table">
                             <thead>
-                                <tr>
-                                    <th colspan="2">소견 생성 규칙</th>
-                                </tr>
                                 <tr class="center aligned">
                                     <th>- 검사 결과 조건</th>
                                     <th>- 소견 내용</th>
