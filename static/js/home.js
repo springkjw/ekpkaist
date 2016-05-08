@@ -6,6 +6,7 @@ $(function() {
 
         var data = $.persist('home');
         if(data) {
+            data_id = data.data_id;
             $('body').html(data.html);
         }
         $('.descriptive').on('click', function() {
@@ -462,7 +463,8 @@ $(function() {
         var data_conclusion_id = id;
 
         $.persist("home", {
-            "html" : $('body').html()
+            "html" : $('body').html(),
+            "data_id" : data_id
         });
 
         window.location.href = '/patient/' + data_id + '/' + data_conclusion_id;

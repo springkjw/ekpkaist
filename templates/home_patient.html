@@ -95,94 +95,128 @@
         </div>
         <div class="fourteen wide column">
             <div class="ui relaxed grid">
-                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;">
-                        <div class="ui grid">
-                            {% for item in rule.conditions %}
-                                {% for obj in test.tests %}
-                                    {% if obj.component == item.component and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
-                                        <div class="eight wide column">
-                                            <table class="ui celled table">
-                                                <thead>
-                                                    <tr>
-                                                        <th colspan="3">
-                                                            {{ obj.category }}
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            {{ obj.component }}
-                                                        </td>
-                                                        {% if obj.evaluation == 'low' or obj.evaluation == 'high' %}
-                                                            <td style="background-color: #ff4335; color:white;">
-                                                                {{ obj.value }}
-                                                            </td>
-                                                        {% else %}
+                <div class="ten wide column">
+                    <div class="ui grid">
+                        <div class="ui segment sixteen wide column" style="height:400px;margin-top:15px;overflow:scroll;">
+                            <div class="ui grid">
+                                {% for item in rule.conditions %}
+                                    {% for obj in test.tests %}
+                                        {% if obj.component == item.component and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
+                                            <div class="eight wide column">
+                                                <table class="ui celled table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="3">
+                                                                {{ obj.category }}
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
                                                             <td>
-                                                                {{ obj.value }}
+                                                                {{ obj.component }}
                                                             </td>
-                                                        {% endif %}
-                                                        <td>
-                                                            {% if obj.evaluation == 'low' %}
-                                                                L
-                                                            {% elif obj.evaluation == 'high' %}
-                                                                H
+                                                            {% if obj.evaluation == 'low' or obj.evaluation == 'high' %}
+                                                                <td style="background-color: #ff4335; color:white;">
+                                                                    {{ obj.value }}
+                                                                </td>
+                                                            {% else %}
+                                                                <td>
+                                                                    {{ obj.value }}
+                                                                </td>
                                                             {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="graph eight wide column" style="margin-top: 20px;">
-                                            <div class="mark" data-value="{{ obj.value }}">
-                                                <i class="dropdown icon"></i>
-                                                <span>{{ obj.value }}</span>
+                                                            <td>
+                                                                {% if obj.evaluation == 'low' %}
+                                                                    L
+                                                                {% elif obj.evaluation == 'high' %}
+                                                                    H
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                            <div class="min" data-value="{{ obj.low }}">
+                                            <div class="graph eight wide column" style="margin-top: 20px;">
+                                                <div class="mark" data-value="{{ obj.value }}">
+                                                    <i class="dropdown icon"></i>
+                                                    <span>{{ obj.value }}</span>
+                                                </div>
+                                                <div class="min" data-value="{{ obj.low }}">
+                                                </div>
+                                                <div class="average" data-value="{{  obj.high }}">
+                                                </div>
+                                                <div class="max">
+                                                </div>
                                             </div>
-                                            <div class="average" data-value="{{  obj.high }}">
-                                            </div>
-                                            <div class="max">
-                                            </div>
-                                        </div>
-                                    {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
+                            </div>
                         </div>
-                        <div class="ui divider"></div>
-                        <div class="ui grid">
-                            <div class="six wide column">
-                                <div class="ui segments">
-                                    <div class="ui tertiary inverted segment">
-                                        검사 결과 조건
-                                    </div>
-                                    <div class="ui segment">
-                                        {% for item in rule.conditions %}
-                                            {{ item.component }} {{ item.operator }} {{ item.value }}
-                                            <div class="ui divider"></div>
-                                        {% endfor %}
-                                        <a>Remark</a>
+                        <div class="sixteen wide column" style="height:280px;overflow:scroll;">
+                            <div class="ui grid">
+                                <div class="sixteen wide column">
+                                    <div class="ui teal inverted segment">
+                                        <div class="ui grid">
+                                            <div class="eight wide column">
+                                                소견 규칙 생성
+                                            </div>
+                                            <div class="eight wide column">
+                                                <button class="tiny ui button descriptive">Descriptive Map</button>
+                                                <div class="tiny ui top dropdown button">
+                                                    현재 Rule 편집
+                                                    <div class="menu">
+                                                        <div class="item">편집</div>
+                                                        <div class="item">삭제</div>
+                                                    </div>
+                                                </div>
+                                                <div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label>출력</label></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="ten wide column">
-                                <div class="ui segments">
-                                    <div class="ui tertiary inverted segment">
-                                         소건 내용
+                                <div class="eight wide column">
+                                    <div class="ui segments">
+                                        <div class="ui tertiary inverted segment">
+                                            검사 결과조건
+                                        </div>
+                                        <div class="ui segment">
+                                            {% for item in rule.conditions %}
+                                                {{ item.component }} {{ item.operator }} {{ item.value }}
+                                                <div class="ui divider"></div>
+                                            {% endfor %}
+                                            <a>Remark</a>
+                                        </div>
                                     </div>
-                                    <div class="ui segment">
-                                        {{ rule.conclusion.text }}
+                                </div>
+                                <div class="eight wide column">
+                                    <div class="ui segments">
+                                        <div class="ui tertiary inverted segment">
+                                            소견 내용
+                                        </div>
+                                        <div class="ui segment">
+                                            {{ rule.conclusion.text }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
                     <div class="ui four wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
-                                    <th class="eleven wide">소견 내용</th>
+                                    <th class="eleven wide">
+                                        <div class="ui grid">
+                                            <div class="eight wide column">
+                                                소견 내용
+                                            </div>
+                                            <div class="right aligned eight wide column">
+                                                <button class="tiny ui button">소견추가</button>
+                                            </div>
+                                        </div>
+                                    </th>
                                     <th class="five wide ui center aligned" colspan="2">출력</th>
                                 </tr>
                             </thead>
@@ -194,8 +228,14 @@
                                                 {{item.text}}
                                             </td>
                                             <td>
-                                                <button class="teal mini ui button" style="display:block;">종합보기</button><br/>
-                                                <button class="teal mini ui button" style="display:block;">현재 Rule 편집</button>
+                                                <button class="teal mini ui button move_back" style="display:block;">종합보기</button><br/>
+                                                <div class="mini ui teal top dropdown button">
+                                                    현재 Rule 편집
+                                                    <div class="menu">
+                                                        <div class="item">편집</div>
+                                                        <div class="item">삭제</div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="ui right aligned">
                                                 <div id="is_print" class="ui checkbox">
