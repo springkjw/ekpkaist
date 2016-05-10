@@ -237,16 +237,15 @@ $(function() {
         }
 
         var cnt_row = Math.ceil(table_data.length / 4);
-
         for(var i = 0; i < cnt_row; i++) {
             if(jQuery.type(table_data[i]) == 'string') {
-                var table_col1 = '<tr><td  class="negative" colspan="3">' + table_data[i] + '</td>';
+                var table_col1 = '<tr><td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i] + '</td>';
             }else {
                 if(table_data[i].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'H';
                 }else if(table_data[i].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'L';
                 }else {
                     var css_value = 'class="warning"';
@@ -261,17 +260,17 @@ $(function() {
                 }else{
                     component = table_data[i].component;
                 }
-                var table_col1 = '<tr><td class="positive">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
+                var table_col1 = '<tr><td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + cnt_row]) == 'string') {
-                var table_col2 = '<td class="negative" colspan="3">' + table_data[i + cnt_row] + '</td>';
+                var table_col2 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + cnt_row] + '</td>';
             }else {
                 if(table_data[i + cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'H';
                 }else if(table_data[i + cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'L';
                 }else {
                     var css_value = 'class="warning"';
@@ -284,19 +283,19 @@ $(function() {
                         component = component.split('-')[1];
                     }
                 }else{
-                    component = table_data[i].component;
+                    component = table_data[i + cnt_row].component;
                 }
-                var table_col2 = '<td class="positive">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col2 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + 2 * cnt_row]) == 'string') {
-                var table_col3 = '<td class="negative" colspan="3">' + table_data[i + 2 * cnt_row] + '</td>';
+                var table_col3 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + 2 * cnt_row] + '</td>';
             }else {
                 if(table_data[i + 2 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'H';
                 }else if(table_data[i + 2 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'L';
                 }else {
                     var css_value = 'class="warning"';
@@ -309,20 +308,20 @@ $(function() {
                         component = component.split('-')[1];
                     }
                 }else{
-                    component = table_data[i].component;
+                    component = table_data[i + 2 * cnt_row].component;
                 }
-                var table_col3 = '<td class="positive">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col3 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
             if(jQuery.type(table_data[i + 3 * cnt_row]) == 'string') {
-                var table_col4 = '<td class="negative" colspan="3">' + table_data[i + 3 * cnt_row] + '</td></tr>';
+                var table_col4 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + 3 * cnt_row] + '</td></tr>';
             }else if(jQuery.type(table_data[i + 3 * cnt_row]) === 'undefined') {
                 var table_col4 = '<td colspan="3"></td>';
             }else {
                 if (table_data[i + 3 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'H';
                 } else if (table_data[i + 3 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: red; color: white;"';
+                    var css_value = 'style="background-color: #D9544F; color: white;"';
                     var evaluation = 'L';
                 } else {
                     var css_value = 'class="warning"';
@@ -337,7 +336,7 @@ $(function() {
                 }else{
                     component = table_data[i + 3 * cnt_row].component;
                 }
-                var table_col4 = '<td class="positive">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
+                var table_col4 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
             }
 
             var table = table_col1 + table_col2 + table_col3 + table_col4;
@@ -398,6 +397,7 @@ $(function() {
             var conclusion = data.rule.conclusion.text;
 
             for(var i = 0; i < condition.length; i++) {
+                console.log(condition[i]);
                 var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
                 if(i != condition.length - 1) {
                     html4 += '<br/>&&<br/>';

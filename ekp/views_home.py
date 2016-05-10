@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 import json
 import urllib2
 import urllib
-
+import ast
 def home(request):
     url = 'http://kecidev.kaist.ac.kr:50000/cases?limit=30'
     query = urllib2.urlopen(url).read()
@@ -110,11 +110,20 @@ def home_patient(request, patient, rule):
     query_book_data = urllib2.urlopen(url_book_data).read()
     serialized_obj_book_data = json.loads(query_book_data)
 
+    obj_data = []
+    object_data = serialized_obj_rule_data['conditions']
+
+    for obj in object_data:
+        obj_data.append(obj['component'])
+
+    obj_data = list(set(obj_data))
+
     template = 'home_patient.html'
     context = {
         "object" : serialized_obj,
         "patient" : patient,
         "rule_id" : int(rule),
+        "obj_data" : obj_data,
         "patient_data" : serialized_patient_data,
         "conclusion" : serialized_obj_conclusion_data,
         "rule" : serialized_obj_rule_data,

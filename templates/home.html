@@ -10,11 +10,11 @@
     <a href="{% url 'home' %}" style="color: inherit;"><h2>종합보기</h2></a> / <a href="#" style="color: inherit;"><h3>상세보기</h3></a>
     <br/>
     <br/>
-    <div class="ui  grid ">
+    <div class="ui grid ">
         <div class="sixteen column">
             <table class="ui table">
                 <tr>
-                    <td class="active two   center aligned"><strong>환자 정보</strong></td>
+                    <td class="two center aligned" style="background-color:#00b5ad;color:white"><strong>환자 정보</strong></td>
                     <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                     <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                     <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="ui relaxed grid">
-        <div class="two wide column" style="height:900px; overflow:scroll;">
+        <div class="two wide column" style="height:1040px; overflow:scroll;">
             <table class="ui compact  center aligned table">
                 <thead>
                     <tr>
@@ -51,61 +51,68 @@
             </table>
         </div>
         <div class="fourteen wide column">
-            <div class="ui relaxed grid">
-                    <div class="ui segment ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;">
-                        <table class="ui compact padded center aligned table">
-                            <tbody class="get_test_data">
-                            </tbody>
-                        </table>
+            <div class="ui grid">
+                    <div class="ui segments ten wide column" style="height: 700px; margin-top: 12px; overflow:scroll;padding: 0;">
+                        <div class="ui teal inverted segment" style="min-height:58px;">
+                            <h4>검사결과</h4>
+                        </div>
+                        <div class="ui segment">
+                            <table class="ui compact padded center aligned table">
+                                <tbody class="get_test_data">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="ui four wide column" style="margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
+                    <div class="four wide column" style="margin-left:7px; margin-top:12px; height: 700px; padding: 0; overflow:scroll; border: 1px solid rgba(34,36,38, .15); border-radius: .28571429rem; box-shadow: 0 1px 2px 0 rgba(34,36,38, .15);">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
-                                    <th class="eleven wide">
+                                    <th class="eleven wide" style="background-color:#00b5ad;color:white;">
                                         <div class="ui grid">
-                                            <div class="eight wide column">
+                                            <div class="twelve wide column">
                                                 소견 내용
                                             </div>
-                                            <div class="right aligned eight wide column">
-                                                <button class="tiny ui button">소견추가</button>
+                                            <div class="four wide column" style="white-space:nowrap;">
+                                                <button class="tiny ui inverted button">소견추가</button>
                                             </div>
                                         </div>
                                     </th>
-                                    <th class="five wide ui center aligned" colspan="2">출력</th>
+                                    <th class="five wide ui center aligned" colspan="2" class="eleven wide" style="background-color:#00b5ad;color:white;">
+                                        출력
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="conclusion">
                             </tbody>
                         </table>
                     </div>
-                    <div class="ui two wide column">
+                    <div class="two wide column" style="margin-left:-7px;">
                         <div class="ui segment">
-                            <button class="tiny ui  button">최종확인</button><i class="large teal check circle icon"></i>
+                            <button class="tiny ui teal basic button">최종확인</button><i class="large teal check circle icon"></i>
                             <div class="ui divider"></div>
-                            <button class="fluid tiny ui  button final">최종 소견 미리보기</button>
+                            <button class="fluid tiny ui teal button final">최종 소견 미리보기</button>
                         </div>
                     </div>
                     <div class="ui segments six wide column" style="height: 280px; margin-top: 12px; overflow:scroll; padding: 0;">
-                        <div class="ui secondary segment">
-                            <div class="ui grid">
-                                <div class="eight wide column">
+                        <div class="ui teal inverted segment">
+                            <div class="ui right aligned grid">
+                                <div class="right floated left aligned six wide column">
                                     <h4>소견 생성 규칙</h4>
                                 </div>
-                                <div class="eight wide column">
-                                    <button class="tiny ui button descriptive">Descriptive Map</button>
-                                    <div class="tiny ui top dropdown button">
+                                <div class="ten wide column">
+                                    <button class="tiny ui inverted button descriptive">Descriptive Map</button>
+                                    <div class="tiny ui top dropdown inverted button">
                                         현재 Rule 편집
                                         <div class="menu">
                                             <div class="item">편집</div>
                                             <div class="item">삭제</div>
                                         </div>
                                     </div>
-                                    <div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label>출력</label></div>
+                                    <div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label style="color:white;">출력</label></div>
                                 </div>
                             </div>
                         </div>
-                        <table class="ui celled padded fixed table">
+                        <table class="ui celled fixed table" style="margin-top:-2px;">
                             <thead>
                                 <tr class="center aligned">
                                     <th>- 검사 결과 조건</th>
@@ -125,12 +132,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ui segment eight wide column" style="height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
+                    <div class="ui segment eight wide column" style="margin-left:7px; height: 280px; margin-top: 12px; margin-right: 20px; padding: 0; overflow:scroll;">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
-                                    <th>관련 의학 자료</th>
-                                    <th class="right aligned"><a href="#" class="more-book"><button class="ui button">더 알아보기</button></a></th>
+                                    <th style="background-color:#00b5ad;color:white;">관련 의학 자료</th>
+                                    <th class="right aligned" style="background-color:#00b5ad;color:white;"><a href="#" class="more-book"><button class="ui inverted button">더 알아보기</button></a></th>
                                 </tr>
                             </thead>
                             <tbody>
