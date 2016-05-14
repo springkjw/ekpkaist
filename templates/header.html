@@ -1,12 +1,12 @@
 <div class="ui top fixed" style="margin-bottom: 10px;">
-  <div class="ui segment">
+  <div class="ui inverted segment">
         {% if 'book' in request.path or 'paper' in request.path %}
-            <h4 class="ui center aligned header">
+            <h4 class="ui center aligned header" style="color:white;">
                 관련 의학 정보
             </h4>
         {% else %}
-            <a href="/"><h4 class="ui center aligned header">
-                혈종결과관리
+            <a href="/"><h4 class="ui center aligned header" style="color:white;">
+                혈종진단시스템
             </h4></a>
         {% endif %}
   </div>

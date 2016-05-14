@@ -1,30 +1,166 @@
 var data_id;
-var rule_id = '';
+var client_id = '';
+var conclusion_id = '';
+var rule_id;
 
 $(function() {
-
-
         var data = $.persist('home');
         if(data) {
             data_id = data.data_id;
             $('body').html(data.html);
+        }else if($.cookie('data')) {
+            var cookie = $.parseJSON($.cookie('data'));
+            $('input[name="daterange"]').val(cookie.date_data);
+            $('.patient_info tr .date').each(function() {
+                if($(this).text() == cookie.date_data) {
+                    $(this).parent().css('display', 'table-row');
+                    if($(this).parent().attr('data-id') == cookie.client_id) {
+                        $(this).parent().addClass('active');
+                    }
+                }else {
+                    $(this).parent().css('display', 'none');
+                }
+            });
+
+            $.ajax({
+                url : '/',
+                data : {
+                    id: cookie.client_id
+                },
+                success : function(data) {
+                    //var record_date = data.patient_data.recorded_date;
+                    client_id = data.patient_data.id;
+                    var hospital = data.patient_data.clinic.name;
+                    var office = data.patient_data.office.name;
+                    var receipt_num = data.patient_data.receipt_number;
+                    var name = data.patient_data.patient.name;
+                    var sex;
+                    if(data.patient_data.patient.sex == 'male') {
+                        sex = '남';
+                    }else {
+                        sex = '여';
+                    }
+                    var age = data.patient_data.patient.age;
+
+                    //$('.record_date_data').val(record_date);
+                    $('.hospital_data').val(hospital);
+                    $('.office_data').val(office);
+                    $('.receipt_num_data').val(receipt_num);
+                    $('.name_data').val(name);
+                    $('.sex_data').val(sex);
+                    $('.age_data').val(age);
+
+                    getTest(data);
+                    conclusion(data);
+
+                    $('.conclusion tr').each(function() {
+                        if($(this).attr('data-id') == cookie.conclusion_id) {
+                            $(this).find('.content').trigger('click');
+                        }
+                    });
+
+                    $.removeCookie('data');
+                }
+            });
+
+            $('.conclusion').css('display', '');
+
+        }else{
+            alert('접수 일자를 선택해 주세요.');
         }
+
+        $('input[name="daterange"]').daterangepicker(
+            {
+                format: 'YYYY-MM-DD',
+                startDate: '2016-05-01',
+                singleDatePicker: true
+            }
+        );
+
+        $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+            var date = picker.startDate.format('YYYY-MM-DD');
+
+            $('.patient_info tr .date').each(function() {
+                if($(this).text() == date) {
+                    $(this).parent().css('display', 'table-row');
+                }else {
+                    $(this).parent().css('display', 'none');
+                }
+            });
+        });
+
+        $('.create_conclusion').on('click', function() {
+            $('.conclusion').css('display', '');
+        });
+
+        $('.add_rule').on('click', function() {
+            if(client_id != '' && conclusion_id != '') {
+                var rds_add_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&conclusionId=' + conclusion_id + '&kaMode=add';
+                window.open(rds_add_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
+        $('.edit_rule').on('click', function() {
+            if(client_id != '' && conclusion_id != '') {
+                var rds_edit_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&conclusionId=' + conclusion_id + '&kaMode=edit';
+                window.open(rds_edit_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
+        $('.delete_rule').on('click', function() {
+            if(client_id != '' && conclusion_id != '') {
+                var rds_delete_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&conclusionId=' + conclusion_id + '&kaMode=delete';
+                window.open(rds_delete_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
         $('.descriptive').on('click', function() {
             var descriptive_url = 'http://localhost:8080/rdr-web/index.htm?clientId=22&ruleId=' + rule_id;
             window.open(descriptive_url);
         });
 
-        $('.ui.dropdown').dropdown();
-
-        $('.ui').on('click', '.dropdown', function() {
-            $(this).dropdown();
+        $('.refresh').on('click', function() {
+            location.reload();
         });
 
-        var now = new Date();
-        $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+        $('.ui.dropdown').dropdown();
+
+        $('.final_check').on('click', function() {
+            var check_test = false;
+            var is_active = false;
+
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('active')) {
+                    is_active = true;
+                }else if($(this).hasClass('check_active')) {
+                    check_test =  true;
+                }
+            });
+            if(is_active) {
+                $('.icon_final').removeClass('disabled').addClass('teal');
+                $('.patient_info .active').removeClass('active').addClass('check_active');
+                $(this).text('확인취소');
+            }else if(check_test && !is_active) {
+                $('.icon_final').addClass('disabled').removeClass('teal');
+                $('.patient_info ._current').addClass('active').removeClass('check_active');
+                $(this).text('최종확인');
+            }else if(!check_test && !is_active) {
+                alert('환자를 선택해주세요.');
+            }
+        });
 
         $('tbody.patient_info tr').on('click', function() {
+            $('.conclusion').css('display', 'none');
             if($(this).hasClass('active')) {
+                client_id = '';
+                conclusion_id = '';
+                $(this).removeClass('_current');
                 $(this).removeClass('active');
                 $('.rule_condition').text('');
                 $('.rule_content').text('');
@@ -32,9 +168,19 @@ $(function() {
                 $('.book').html('');
                 $('.get_test_data').html('');
                 $('.conclusion').html('');
+                $('.tests_wrong').text('0');
             }else {
                 $(this).parent().children().removeClass('active');
-                $(this).addClass('active');
+                $(this).parent().children().removeClass('_current');
+                $(this).addClass('_current');
+                if(!$(this).hasClass('check_active')){
+                    $(this).addClass('active');
+                    $('.final_check').text('최종확인');
+                    $('.icon_final').addClass('disabled').removeClass('teal');
+                }else{
+                    $('.final_check').text('확인취소');
+                    $('.icon_final').removeClass('disabled').addClass('teal');
+                }
                 $('.rule_condition').text('');
                 $('.rule_content').text('');
                 $('.topic').html('');
@@ -48,7 +194,8 @@ $(function() {
                         id: data_id
                     },
                     success : function(data) {
-                        var record_date = data.patient_data.recorded_date;
+                        //var record_date = data.patient_data.recorded_date;
+                        client_id = data.patient_data.id;
                         var hospital = data.patient_data.clinic.name;
                         var office = data.patient_data.office.name;
                         var receipt_num = data.patient_data.receipt_number;
@@ -61,7 +208,7 @@ $(function() {
                         }
                         var age = data.patient_data.patient.age;
 
-                        $('.record_date_data').val(record_date);
+                        //$('.record_date_data').val(record_date);
                         $('.hospital_data').val(hospital);
                         $('.office_data').val(office);
                         $('.receipt_num_data').val(receipt_num);
@@ -80,7 +227,13 @@ $(function() {
             if(!$(this).parent().hasClass('active')){
                 $(this).parent().parent().children().removeClass('active').find('.button').css('display', 'none').removeClass('teal');
                 $(this).parent().addClass('active').find('.button').css('display', 'block').addClass('teal');
-
+                conclusion_id = $(this).parent().attr('data-id');
+                var data_info = {
+                    date_data : $('input[name="daterange"]').val(),
+                    client_id : client_id,
+                    conclusion_id : conclusion_id
+                };
+                $.cookie('data', JSON.stringify(data_info));
                 var data_rule_id = $(this).parent().attr('data-rule-id');
                 var data_text = $(this).parent().attr('data-text');
 
@@ -115,6 +268,7 @@ $(function() {
                 });
 
             }else{
+                conclusion_id = '';
                 $(this).parent().removeClass('active').find('.button').css('display', 'none').removeClass('teal');
                 $('.rule_condition').text('');
                 $('.rule_content').text('');
@@ -164,9 +318,6 @@ $(function() {
 
 
     $('.more-book').on('click', function() {
-        //$.persist('home', {
-        //    "html" : $('body').html()
-        //});
         var book_url = $(this).attr('data-url');
         window.open(book_url);
     });
@@ -237,18 +388,21 @@ $(function() {
         }
 
         var cnt_row = Math.ceil(table_data.length / 4);
+        var cnt_wrong = 0;
         for(var i = 0; i < cnt_row; i++) {
             if(jQuery.type(table_data[i]) == 'string') {
-                var table_col1 = '<tr><td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i] + '</td>';
+                var table_col1 = '<tr><td colspan="3" style="background-color:#ffd9f7;color:#db2828;">' + table_data[i] + '</td>';
             }else {
                 if(table_data[i].evaluation == 'high') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'H';
+                    cnt_wrong ++;
                 }else if(table_data[i].evaluation == 'low') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'L';
+                    cnt_wrong ++;
                 }else {
-                    var css_value = 'class="warning"';
+                    var css_value = 'style="background-color:#fff7f0;"';
                     var evaluation = '';
                 }
                 var component;
@@ -260,20 +414,22 @@ $(function() {
                 }else{
                     component = table_data[i].component;
                 }
-                var table_col1 = '<tr><td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
+                var table_col1 = '<tr><td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + cnt_row]) == 'string') {
-                var table_col2 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + cnt_row] + '</td>';
+                var table_col2 = '<td colspan="3" style="background-color:#ffd9f7;color:#db2828;">' + table_data[i + cnt_row] + '</td>';
             }else {
                 if(table_data[i + cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'H';
+                    cnt_wrong ++;
                 }else if(table_data[i + cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'L';
+                    cnt_wrong ++;
                 }else {
-                    var css_value = 'class="warning"';
+                    var css_value = 'style="background-color:#fff7f0;"';
                     var evaluation = '';
                 }
                 var component;
@@ -285,20 +441,22 @@ $(function() {
                 }else{
                     component = table_data[i + cnt_row].component;
                 }
-                var table_col2 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col2 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + 2 * cnt_row]) == 'string') {
-                var table_col3 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + 2 * cnt_row] + '</td>';
+                var table_col3 = '<td colspan="3" style="background-color:#ffd9f7;color:#db2828;">' + table_data[i + 2 * cnt_row] + '</td>';
             }else {
                 if(table_data[i + 2 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'H';
+                    cnt_wrong ++;
                 }else if(table_data[i + 2 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'L';
+                    cnt_wrong ++;
                 }else {
-                    var css_value = 'class="warning"';
+                    var css_value = 'style="background-color:#fff7f0;"';
                     var evaluation = '';
                 }
                 var component;
@@ -310,21 +468,23 @@ $(function() {
                 }else{
                     component = table_data[i + 2 * cnt_row].component;
                 }
-                var table_col3 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col3 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
             if(jQuery.type(table_data[i + 3 * cnt_row]) == 'string') {
-                var table_col4 = '<td colspan="3" style="background-color:#FBCAAC;color:white;">' + table_data[i + 3 * cnt_row] + '</td></tr>';
+                var table_col4 = '<td colspan="3" style="background-color:#ffd9f7;color:#db2828;">' + table_data[i + 3 * cnt_row] + '</td></tr>';
             }else if(jQuery.type(table_data[i + 3 * cnt_row]) === 'undefined') {
                 var table_col4 = '<td colspan="3"></td>';
             }else {
                 if (table_data[i + 3 * cnt_row].evaluation == 'high') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'H';
+                    cnt_wrong ++;
                 } else if (table_data[i + 3 * cnt_row].evaluation == 'low') {
-                    var css_value = 'style="background-color: #D9544F; color: white;"';
+                    var css_value = 'style="background-color: #FF0000; color: white;"';
                     var evaluation = 'L';
+                    cnt_wrong ++;
                 } else {
-                    var css_value = 'class="warning"';
+                    var css_value = 'style="background-color:#fff7f0;"';
                     var evaluation = '';
                 }
                 var component;
@@ -336,12 +496,13 @@ $(function() {
                 }else{
                     component = table_data[i + 3 * cnt_row].component;
                 }
-                var table_col4 = '<td style="background-color:#FBCAAC;">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
+                var table_col4 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
             }
 
             var table = table_col1 + table_col2 + table_col3 + table_col4;
 
             $('.get_test_data').append(table);
+            $('.tests_wrong').text(cnt_wrong);
         }
     }
 
@@ -365,17 +526,10 @@ $(function() {
                 conclusion_rule_ids = conclusion_rule_ids_;
             }
 
-            var html3 = '<tr class="conclusion_content" data-rule-id="' + conclusion_rule_ids + '" data-text="' + conclusion[i].text + '">' +
+            var html3 = '<tr class="conclusion_content" data-id="' + conclusion[i].id + '" data-rule-id="' + conclusion_rule_ids + '" data-text="' + conclusion[i].text + '">' +
                 '<td class="content">' + conclusion[i].text + '</td>' +
                     '<td>' +
                         '<button class="mini ui button" style="display:none;" onclick="moveDetail(' + conclusion[i].id + ')">상세보기</button><br/>' +
-                        '<div class="mini ui teal top dropdown button" style="display:none">' +
-                            '현재 Rule 편집' +
-                            '<div class="menu">' +
-                                '<div class="item">편집</div>' +
-                                '<div class="item">삭제</div>' +
-                            '</div>' +
-                        '</div>'+
                     '</td>' +
                     '<td class="ui right aligned">' +
                         '<div id="is_print" class="ui checkbox">' +
@@ -397,7 +551,6 @@ $(function() {
             var conclusion = data.rule.conclusion.text;
 
             for(var i = 0; i < condition.length; i++) {
-                console.log(condition[i]);
                 var html4 = '<span>' + condition[i].component + condition[i].operator + condition[i].value + '</span>';
                 if(i != condition.length - 1) {
                     html4 += '<br/>&&<br/>';

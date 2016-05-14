@@ -33,3 +33,8 @@ a, h1, h2, h3 {
     marigin-top:35px;
 
 }
+
+.check_active {
+    background-color: #A0A0A0;
+    color : white;
+}
