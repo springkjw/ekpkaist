@@ -2,19 +2,23 @@ a, h1, h2, h3 {
     display: inline;
 }
 
+a {
+    cursor:pointer;
+}
+
 .min, .average, .max {
     position: relative;
-    min-height: 24.5px;
+    min-height: 16px;
     min-width: 7em;
     float:left;
 }
 
 .min, .max {
-    background-color: #D9544F;
+    background-color: #ff0000;
 }
 
 .average {
-    background-color: #78AE62;
+    background-color: #1ddb16;
 }
 
 .mark {
@@ -24,7 +28,13 @@ a, h1, h2, h3 {
 }
 
 .min {
-    text-align: right;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.max {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .mark_left {
@@ -37,4 +47,8 @@ a, h1, h2, h3 {
 .check_active {
     background-color: #A0A0A0;
     color : white;
+}
+
+.opacity_cell {
+    opacity: 0.2;
 }

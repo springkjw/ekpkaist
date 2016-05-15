@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load utils %}
 
 {% block javascript %}
     <script type="text/javascript" src="{% static 'js/home_detail.js' %}"></script>
@@ -41,13 +42,119 @@
             var per = (21 - parseFloat(21 * data_max / data_total)).toString() + 'em';
             var per_data = parseFloat(21 * _data / data_total).toString() + 'em';
 
-            $(this).find('.min').css('min-width', min_per);
-            $(this).find('.average').css('min-width', max_per);
-            $(this).find('.max').css('min-width', per);
-            $(this).find('.mark').css('padding-left', per_data);
+            $(this).find('.min').animate({'min-width': min_per}, {duration:2800,specialEasing:{width: "easeOutBounce"}});
+            $(this).find('.average').animate({'min-width': max_per}, {duration:2800,specialEasing:{width: "easeOutBounce"}});
+            $(this).find('.max').animate({'min-width': per}, {duration:2800,specialEasing:{width: "easeOutBounce"}});
+            $(this).find('.mark').animate({'padding-left': per_data}, {duration:2500,specialEasing:{width: "easeOutBounce"}});
+        });
+
+        $('tbody.conclusion tr').on('click', function() {
+            var client_id = '{{ patient }}';
+            var conclusion_id = $(this).attr('data-id');
+            if(conclusion_id != '{{ rule_id }}') {
+                var url = '../../patient/' + client_id + '/' + conclusion_id;
+                $(location).attr('href', url);
+            }
+        });
+
+        $('tbody.patient_info tr').on('click', function() {
+            var data_info = {
+                date_data : $('input[name="daterange"]').val(),
+                client_id : '{{ patient }}',
+                check_data : []
+            };
+            $.cookie('data_patient', JSON.stringify(data_info));
+            $(location).attr('href', '/');
+        });
+
+        $('.move_back').click(function(){
+            var conclusion_id = $(this).parent().parent().attr('data-id');
+
+            var data_info = {
+                date_data : $('input[name="daterange"]').val(),
+                client_id : '{{ patient }}',
+                check_data : [],
+                conclusion_id : conclusion_id
+            };
+
+            $.cookie('data', JSON.stringify(data_info));
+
+            $(location).attr('href', '/');
+	    });
+
+        $('.expand_img').on('click', function() {
+            if($('.rule_graph').children().hasClass('graph_img') || $('.rule_graph').children().children().hasClass('graph_img')) {
+                var img_all_url = $('.graph_img').attr('src').split('.')[0] + '-all.jpg';
+                var img_all_html = '<a class="pan" data-big="' + img_all_url + '" href=""><img class="graph_img ui fluid image" src=' + $('.graph_img').attr('src') + '></a>';
+
+                $('.rule_graph').html('').html(img_all_html);
+
+                $(".pan").pan();
+
+                var close_btn = '<button class="circular ui icon button"><i class="remove icon"></i></button>';
+                $('.panWrapper .close').append(close_btn);
+
+                $('.graph_img').trigger('click');
+
+            }else{
+                alert('그래프가 없습니다.');
+            }
+        });
+
+        $('.add_rule').on('click', function() {
+            if('{{ patient }}' != '' && '{{ rule_id }}' != '') {
+                var rds_add_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + '{{ patient }}' + '&conclusionId=' + '{{ rule_id }}' + '&kaMode=add';
+                window.open(rds_add_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
+        $('.edit_rule').on('click', function() {
+            if('{{ patient }}' != '' && '{{ rule_id }}' != '') {
+                var rds_edit_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + '{{ patient }}' + '&conclusionId=' + '{{ rule_id }}' + '&kaMode=edit';
+                window.open(rds_edit_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
+        $('.delete_rule').on('click', function() {
+            if('{{ patient }}' != '' && '{{ rule_id }}' != '') {
+                var rds_delete_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + '{{ patient }}' + '&conclusionId=' + '{{ rule_id }}' + '&kaMode=delete';
+                window.open(rds_delete_url);
+            }else {
+                alert('환자 또는 소견을 선택해주세요.');
+            }
+        });
+
+        $('.descriptive').on('click', function() {
+            var rule_id = $('.conclusion .active').attr('data-rule-id').replace(/ /g,'').replace('[','').replace(']','');
+            if('{{ patient }}' != '' && rule_id != '') {
+                if(/,/i.test(rule_id)) {
+                    var newName;
+                    var rule_id_ = rule_id.split(',');
+                    for(var i = 0; i < rule_id_.length; i++) {
+                        newName = 'rds' + rule_id_[i];
+                        var descriptive_url_ = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + '{{ patient }}' + '&ruleId=' + rule_id_[i];
+                        window.open(descriptive_url_, newName);
+                    }
+                }else{
+                    var descriptive_url;
+                    descriptive_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + '{{ patient }}' + '&ruleId=' + rule_id;
+                    window.open(descriptive_url);
+                }
+            }
         });
 
     });
+
+    function rule_graph(attritube) {
+        var img_url = '{% static "img/graph/" %}' + attritube + '.jpg';
+        var img_html = '<img class="graph_img ui fluid image" src=' + img_url + '>';
+
+        $('.rule_graph').html('').html(img_html);
+    }
 </script>
 <div class="ui main" style="margin: 0 10px 0 10px;">
     <a href="{% url 'home' %}" style="color: inherit;"><h3>종합보기</h3></a> / <a href="#" style="color: inherit;"><h2>상세보기</h2></a>
@@ -58,8 +165,7 @@
             <table class="ui table">
                 <tr>
                     <td class="two   center aligned" style="background-color:#00b5ad;color:white;"><strong>환자 정보</strong></td>
-                    <td class="current two  center aligned">기준 일자 - <input type="text" class="current_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
-                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
+                    <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" id='daterange' name="daterange" readonly value="   " style="width:100px !important;"/></td>
                     <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                     <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                     <td class="receipt_num two  center aligned">접수번호 - <input class="receipt_num_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
@@ -102,109 +208,172 @@
                                 <h4>검사결과</h4>
                             </div>
                             <div class="ui container" style="margin-top:15px;">
-                            <div class="ui grid">
-                                {% for item in obj_data %}
-                                    {% for obj in test.tests %}
-                                        {% if obj.component == item and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
-                                            <div class="eight wide column">
-                                                <table class="ui celled table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="3">
-                                                                {{ obj.category }}
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                {{ obj.component }}
-                                                            </td>
-                                                            {% if obj.evaluation == 'low' or obj.evaluation == 'high' %}
-                                                                <td style="background-color: #ff4335; color:white;">
-                                                                    {{ obj.value }}
-                                                                </td>
-                                                            {% else %}
-                                                                <td>
-                                                                    {{ obj.value }}
-                                                                </td>
-                                                            {% endif %}
-                                                            <td>
-                                                                {% if obj.evaluation == 'low' %}
-                                                                    L
-                                                                {% elif obj.evaluation == 'high' %}
-                                                                    H
+                                <div class="result ui centered grid">
+                                    {% for item in obj_data %}
+                                        {% for obj in test.tests %}
+                                            {% if obj.component == item.component and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
+                                                <div class="result_active six wide column" style="margin-left:10px;">
+                                                    <table class="ui celled table">
+                                                        <tbody>
+                                                            <tr>
+                                                                {% if item.attritube == '00001' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00002' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00003' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00004' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00019' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00020' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00021' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00022' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00023' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00024' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00025' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00028' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% elif item.attritube == '00029' %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        <a onclick="rule_graph('{{ item.attritube }}')" style="text-decoration: underline;">{{ obj.component }}</a>
+                                                                    </td>
+                                                                {% else %}
+                                                                    <td data-id="{{ item.attritube }}">
+                                                                        {{ obj.component }}
+                                                                    </td>
                                                                 {% endif %}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="graph eight wide column" style="margin-top: 20px;">
-                                                <div class="mark" data-value="{{ obj.value }}">
-                                                    <i class="dropdown icon"></i>
-                                                    <span>{{ obj.value }}</span>
+                                                                {% if obj.evaluation == 'low' or obj.evaluation == 'high' %}
+                                                                    <td style="background-color: #ff4335; color:white;">
+                                                                        {{ obj.value }}
+                                                                    </td>
+                                                                {% else %}
+                                                                    <td>
+                                                                        {{ obj.value }}
+                                                                    </td>
+                                                                {% endif %}
+                                                                <td>
+                                                                    {% if obj.evaluation == 'low' %}
+                                                                        L
+                                                                    {% elif obj.evaluation == 'high' %}
+                                                                        H
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                                <div class="min" data-value="{{ obj.low }}">
-                                                </div>
-                                                <div class="average" data-value="{{  obj.high }}">
-                                                </div>
-                                                <div class="max">
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            </div>
-                            </div>
-                        </div>
-                        <div class="sixteen wide column" style="height:280px;overflow:scroll;">
-                            <div class="ui grid">
-                                <div class="sixteen wide column">
-                                    <div class="ui teal inverted segment">
-                                        <div class="ui grid">
-                                            <div class="eight wide column">
-                                                소견 규칙 생성
-                                            </div>
-                                            <div class="eight wide column">
-                                                <button class="tiny ui inverted button descriptive">Descriptive Map</button>
-                                                <div class="tiny ui top inverted dropdown button">
-                                                    현재 Rule 편집
-                                                    <div class="menu">
-                                                        <div class="item">편집</div>
-                                                        <div class="item">삭제</div>
+                                                <div class="graph six wide column">
+                                                    <div class="mark" data-value="{{ obj.value }}">
+                                                        <i class="dropdown icon"></i>
+                                                        <span>{{ obj.value }}</span>
+                                                    </div>
+                                                    <div class="min" data-value="{{ obj.low }}">
+                                                    </div>
+                                                    <div class="average" data-value="{{  obj.high }}">
+                                                    </div>
+                                                    <div class="max">
                                                     </div>
                                                 </div>
-                                                <div class="ui checkbox"><input type="checkbox"  id="rule_is_print" name="print" checked="true"><label style="color:white;">출력</label></div>
+                                                <div class="three wide column">
+                                                    <p>Low : {{ obj.low }}</p>
+                                                    <p>High : {{ obj.high }}</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui segments sixteen wide column" style="height: 297px; margin-top: -15px; overflow:scroll; padding: 0;">
+                            <div class="ui teal inverted segment">
+                                <div class="ui right aligned grid">
+                                    <div class="right floated left aligned six wide column">
+                                        <h4>소견 생성 규칙</h4>
+                                    </div>
+                                    <div class="ten wide column">
+                                        <button class="tiny ui inverted button descriptive">상세설명</button>
+                                        <div class="tiny ui top dropdown inverted button">
+                                            현재 규칙편집
+                                            <div class="menu">
+                                                <div class="edit_rule item">편집</div>
+                                                <div class="delete_rule item">삭제</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="eight wide column">
-                                    <div class="ui segments">
-                                        <div class="ui segment">
-                                            검사 결과조건
-                                        </div>
-                                        <div class="ui segment">
-                                            {% for item in rule.conditions %}
-                                                {{ item.component }} {{ item.operator }} {{ item.value }}
-                                                <div class="ui divider"></div>
-                                            {% endfor %}
-                                            <a>Remark</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="eight wide column">
-                                    <div class="ui segments">
-                                        <div class="ui segment">
-                                            소견 내용
-                                        </div>
-                                        <div class="ui segment">
-                                            {{ rule.conclusion.text }}
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
+                            <table class="ui celled fixed table" style="margin-top:-2px;">
+                                <thead>
+                                    <tr class="center aligned">
+                                        <th>- 검사 결과 조건</th>
+                                        <th>- 소견 내용</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="height: 100%;">
+                                        <td class="rule_condition center aligned" style="height:190px;">
+                                            {% if rule|get_type == "<type 'dict'>" %}
+                                                {% for item in rule.conditions %}
+                                                    {{ item.component }} {{ item.operator }} {{ item.value }}
+                                                    {% if forloop.counter0|add:1 != rule.conditions|length %}
+                                                        <br/>&&<br/>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {% for obj in rule %}
+                                                    {% for item in obj.conditions %}
+                                                        {{ item.component }} {{ item.operator }} {{ item.value }}
+                                                        {% if forloop.counter0|add:1 != obj.conditions|length %}
+                                                            <br/>&&<br/>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if forloop.counter0|add:1 != rule|length %}
+                                                        <div class="ui divider"></div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="rule_content center aligned" style="height:190px;">
+                                            {% if rule|get_type == "<type 'dict'>" %}
+                                                {{ rule.conclusion.text }}
+                                            {% else %}
+                                                {{ rule.0.conclusion.text }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -214,15 +383,16 @@
                                 <tr>
                                     <th class="eleven wide" style="background-color:#00b5ad;color:white;">
                                         <div class="ui grid">
-                                            <div class="twelve wide column">
-                                                소견 내용
-                                            </div>
-                                            <div class="four wide column" style="white-space:nowrap;">
-                                                <button class="tiny ui inverted button">소견추가</button>
+                                            <div class="sixteen wide column">
+                                                소견 내용 &nbsp;
+                                                <button class="circular ui icon mini button refresh" style="background-color:white;">
+                                                    <i class="teal large repeat icon"></i>
+                                                </button>&nbsp;&nbsp;
+                                                <button class="add_rule tiny ui inverted button">규칙추가</button>
                                             </div>
                                         </div>
                                     </th>
-                                    <th class="five wide ui center aligned" colspan="2" class="eleven wide" style="background-color:#00b5ad;color:white;">
+                                    <th class="five wide ui right aligned" colspan="2" class="eleven wide" style="background-color:#00b5ad;color:white;">
                                         출력
                                     </th>
                                 </tr>
@@ -230,19 +400,12 @@
                             <tbody class="conclusion">
                                 {% for item in conclusion.conclusions %}
                                     {% if item.id == rule_id %}
-                                        <tr class="conclusion_content active" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
+                                        <tr class="conclusion_content active" data-id="{{item.id}}" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
                                             <td class="content">
                                                 {{item.text}}
                                             </td>
                                             <td>
                                                 <button class="teal mini ui button move_back" style="display:block;">종합보기</button><br/>
-                                                <div class="mini ui teal top dropdown button">
-                                                    현재 Rule 편집
-                                                    <div class="menu">
-                                                        <div class="item">편집</div>
-                                                        <div class="item">삭제</div>
-                                                    </div>
-                                                </div>
                                             </td>
                                             <td class="ui right aligned">
                                                 <div id="is_print" class="ui checkbox">
@@ -251,13 +414,12 @@
                                             </td>
                                         </tr>
                                     {% else %}
-                                        <tr class="conclusion_content" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
+                                        <tr class="conclusion_content" data-id="{{item.id}}" data-rule-id="{{item.rule_ids}}" data-text="{{item.text}}">
                                             <td class="content">
                                                 {{item.text}}
                                             </td>
                                             <td>
                                                 <button class="teal mini ui button" style="display:none;">종합보기</button><br/>
-                                                <button class="teal mini ui button" style="display:none;">현재 Rule 편집</button>
                                             </td>
                                             <td class="ui right aligned">
                                                 <div id="is_print" class="ui checkbox">
@@ -270,44 +432,31 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="two wide column" style="margin-left:-10px;">
+                    <div class="two wide column" style="margin-left:-7px;">
                         <div class="ui segment">
-                            <button class="tiny ui teal basic button">최종확인</button><i class="large teal check circle icon"></i>
+                            <button class="tiny ui teal basic button final_check">최종확인</button><i class="icon_final large disabled check circle icon"></i>
                             <div class="ui divider"></div>
                             <button class="fluid tiny ui teal button final">최종 소견 미리보기</button>
                         </div>
                     </div>
-                    <div class="nine wide column" style="height: 280px; margin-top: 12px; margin-left: 16px; overflow:scroll; padding: 0;">
-                        <div class="ui grid">
-                            <div class="eight wide column">
-                                <div class="ui segments" >
-                                    <div class="ui teal inverted segment">
-                                        <div class="ui grid">
-                                            <div class="ten wide column" >
-                                                <h4>지표 - 진단 그래프</h4>
-                                            </div>
-                                            <div class="six wide column">
-                                                <button class="tiny ui inverted button">더 알아보기</button>
-                                            </div>
-                                        </div>
+                    <div class="eight wide column" style="height: 280px; margin-left: 6px; overflow:scroll; padding: 0;">
+                        <div class="ui segments" >
+                            <div class="ui teal inverted segment">
+                                <div class="right aligned ui grid">
+                                    <div class=" right floated left aligned ten wide column" >
+                                        <h4>지표 - 진단 그래프</h4>
                                     </div>
-                                    <div class="ui segment" style="min-height:280px;">
+                                    <div class="six wide column">
+                                        <button class="expand_img tiny ui inverted button">크게 보기</button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="eight wide column">
-                                <div class="ui segments" style="margin-left:-20px;">
-                                    <div class="ui teal inverted segment" style="min-height:60px;">
-                                        <h4>비슷한 환자 사례</h4>
-                                    </div>
-                                    <div class="ui segment">
-                                        <img src="{% static 'img/case.JPG' %}" />
-                                    </div>
-                                </div>
+                            <div class="rule_graph center aligned ui segment" style="min-height:280px;">
+                                <h4 style="margin-top:10%;">검사결과에서 하이퍼링크가 있는 지표를 클릭해주세요.</h4>
                             </div>
                         </div>
                     </div>
-                    <div class="ui segment five wide column" style="height: 280px; margin-top: 12px; margin-left: 4px; padding: 0; overflow:scroll;">
+                    <div class="ui segment six wide column" style="height: 280px; margin-top:-2px;padding: 0; overflow:scroll;">
                         <table class="ui padded table">
                             <thead>
                                 <tr>
@@ -316,33 +465,41 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="height: 40px;">
-                                    <td colspan="2" class="topic">
-                                        {% for item in book.topics %}
-                                            <a href="#" class="ui label" style="margin: 5px;"><span class="keyword">{{ item.topic_title }}</span></a>
-                                        {% endfor %}
-                                    </td>
-                                </tr>
-                                <tr style="height: 280px;">
-                                    <td colspan="2">
-                                        <div class="ui divided items book">
-                                            {% for item in book.books %}
-                                                <div class="item">
-                                                    <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
-                                                    <div class="middle aligned content">
-                                                        <a class="header" href="#">{{ item.book_source }}</a>
-                                                        <div class="metadata">
-                                                            <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
-                                                        </div>
-                                                        <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
-                                                            {{ item.book_highlighted_contents|safe }}
+                                {% if book.total_doc == 0 %}
+                                    <tr style="height:320px;">
+                                        <td colspan="2" style="vertical-align: text-top; text-align:center;">
+                                            <h4 style="margin-top:12%;">관련 의학 자료 데이터가 없습니다.</h4>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr style="height: 40px;">
+                                        <td colspan="2" class="topic">
+                                            {% for item in book.topics %}
+                                                <a href="#" class="ui label" style="margin: 5px;"><span class="keyword">{{ item.topic_title }}</span></a>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr style="height: 280px;">
+                                        <td colspan="2">
+                                            <div class="ui divided items book">
+                                                {% for item in book.books %}
+                                                    <div class="item">
+                                                        <img class="ui middle aligned tiny image" src="{{ item.book_image_url }}" style="max-height: 100px;">
+                                                        <div class="middle aligned content">
+                                                            <a class="header" href="#">{{ item.book_source }}</a>
+                                                            <div class="metadata">
+                                                                <strong class="date">{{ item.book_year }}</strong> by <span class="description">{{ item.book_author }}</span>
+                                                            </div>
+                                                            <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
+                                                                {{ item.book_highlighted_contents|safe }}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </td>
-                                </tr>
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                         <div class="ui dimmer">
@@ -359,7 +516,7 @@
 </div>
 <div class="ui modal">
     <i class="close icon"></i>
-    <div class="header">
+    <div class="header" style="background: #00b5ad; color:white;">
         최종 소견
     </div>
     <div class="content">
@@ -367,7 +524,6 @@
         <div class="ten column">
             <table class="ui table">
                 <tr>
-                    <td class="record_date one wide center aligned">접수 일자<input type="text" class="record_date_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
                     <td class="hospital one center aligned">병원명<input class="hospital_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
                     <td class="ofiice one center aligned">영업소<input class="office_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
                     <td class="receipt_num one center aligned">접수번호<input class="receipt_num_data ui basic label center aligned" readonly value="" style="width:100px !important;"/></td>
@@ -382,6 +538,12 @@
         </div>
     </div>
     <div class="actions">
+        <div class="ui black deny button">
+            편집
+        </div>
+        <div class="ui black deny button">
+            인쇄
+        </div>
         <div class="ui black deny button">
             닫기
         </div>

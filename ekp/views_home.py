@@ -87,17 +87,52 @@ def home_patient(request, patient, rule):
     url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient
     url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/tests"
     url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/conclusions"
-    url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + rule
+
     query_data = urllib2.urlopen(url_data).read()
     query_test_data = urllib2.urlopen(url_test_data).read()
     query_conclusion_data = urllib2.urlopen(url_conclusion_data).read()
-    query_rule_data = urllib2.urlopen(url_rule_data).read()
-
 
     serialized_patient_data = json.loads(query_data)
     serialized_obj_test_data = json.loads(query_test_data)
     serialized_obj_conclusion_data = json.loads(query_conclusion_data)
-    serialized_obj_rule_data = json.loads(query_rule_data)
+
+    rule_ids = []
+    for obj in serialized_obj_conclusion_data["conclusions"]:
+        if obj["id"] == int(rule):
+            rule_ids = obj["rule_ids"]
+
+    obj_data = []
+    obj_data_ = []
+    if len(rule_ids) != 1:
+        serialized_obj_rule_data = []
+        for i in range(0, len(rule_ids)):
+            url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + str(rule_ids[i])
+            query_rule_data = urllib2.urlopen(url_rule_data).read()
+            serialized_obj_rule_data.append(json.loads(query_rule_data))
+
+        for i in range(0, len(serialized_obj_rule_data)):
+            object_data = serialized_obj_rule_data[i]['conditions']
+
+    else:
+        url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + rule
+        query_rule_data = urllib2.urlopen(url_rule_data).read()
+        serialized_obj_rule_data = json.loads(query_rule_data)
+
+        object_data = serialized_obj_rule_data['conditions']
+
+        for obj in object_data:
+            obj_data.append(obj['component'])
+
+        obj_data = list(set(obj_data))
+
+        for i in object_data:
+            for j in obj_data:
+                if i['component'] is j:
+                    data_ = {
+                        'component' : j,
+                        'attritube' : i['attribute']
+                    }
+                    obj_data_.append(data_)
 
     keyword_data = ''
     for item in serialized_obj_conclusion_data["conclusions"]:
@@ -106,24 +141,27 @@ def home_patient(request, patient, rule):
 
     keyword = urllib.quote_plus(keyword_data.encode('utf-8'))
 
-    url_book_data = 'http://ekp.kaist.ac.kr/apis/getBooks?q=' + keyword + "&prev=1&next=2"
-    query_book_data = urllib2.urlopen(url_book_data).read()
-    serialized_obj_book_data = json.loads(query_book_data)
+    try:
+        url_book_data = 'http://ekp.kaist.ac.kr/apis/getBooks?q=' + keyword + "&prev=1&next=2"
+        query_book_data = urllib2.urlopen(url_book_data).read()
 
-    obj_data = []
-    object_data = serialized_obj_rule_data['conditions']
+        serialized_obj_book_data = json.loads(query_book_data)
+    except ValueError:
+        serialized_obj_book_data = {
+            'books': [],
+            'keywords': [],
+            'topics': [],
+            'total_doc': 0
+        }
 
-    for obj in object_data:
-        obj_data.append(obj['component'])
-
-    obj_data = list(set(obj_data))
+    print type(serialized_obj_rule_data)
 
     template = 'home_patient.html'
     context = {
         "object" : serialized_obj,
         "patient" : patient,
         "rule_id" : int(rule),
-        "obj_data" : obj_data,
+        "obj_data" : obj_data_,
         "patient_data" : serialized_patient_data,
         "conclusion" : serialized_obj_conclusion_data,
         "rule" : serialized_obj_rule_data,

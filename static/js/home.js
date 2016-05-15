@@ -1,13 +1,41 @@
-var data_id;
+var data_id = '';
 var client_id = '';
 var conclusion_id = '';
-var rule_id;
+var rule_id = '';
 
 $(function() {
         var data = $.persist('home');
         if(data) {
             data_id = data.data_id;
             $('body').html(data.html);
+            $('input[name="daterange"]').val(data.date_data);
+            $.ajax({
+                url : '/',
+                data : {
+                    id: data_id
+                },
+                success : function(data) {
+                    var hospital = data.patient_data.clinic.name;
+                    var office = data.patient_data.office.name;
+                    var receipt_num = data.patient_data.receipt_number;
+                    var name = data.patient_data.patient.name;
+                    var sex;
+                    if(data.patient_data.patient.sex == 'male') {
+                        sex = '남';
+                    }else {
+                        sex = '여';
+                    }
+                    var age = data.patient_data.patient.age;
+
+                    //$('.record_date_data').val(record_date);
+                    $('.hospital_data').val(hospital);
+                    $('.office_data').val(office);
+                    $('.receipt_num_data').val(receipt_num);
+                    $('.name_data').val(name);
+                    $('.sex_data').val(sex);
+                    $('.age_data').val(age);
+                }
+            });
         }else if($.cookie('data')) {
             var cookie = $.parseJSON($.cookie('data'));
             $('input[name="daterange"]').val(cookie.date_data);
@@ -19,6 +47,14 @@ $(function() {
                     }
                 }else {
                     $(this).parent().css('display', 'none');
+                }
+            });
+
+            $('.patient_info tr').each(function() {
+                for(var i = 0; i < cookie.check_data.length; i++) {
+                    if(cookie.check_data[i] == $(this).attr('data-id')) {
+                        $(this).addClass('check_active').removeClass('active');
+                    }
                 }
             });
 
@@ -121,8 +157,21 @@ $(function() {
         });
 
         $('.descriptive').on('click', function() {
-            var descriptive_url = 'http://localhost:8080/rdr-web/index.htm?clientId=22&ruleId=' + rule_id;
-            window.open(descriptive_url);
+            if(client_id != '' && rule_id != '') {
+                if(/,/i.test(rule_id)) {
+                    var newName;
+                    var rule_id_ = rule_id.split(',');
+                    for(var i = 0; i < rule_id_.length; i++) {
+                        newName = 'rds' + rule_id_[i];
+                        var descriptive_url_ = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&ruleId=' + rule_id_[i];
+                        window.open(descriptive_url_, newName);
+                    }
+                }else{
+                    var descriptive_url;
+                    descriptive_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&ruleId=' + rule_id;
+                    window.open(descriptive_url);
+                }
+            }
         });
 
         $('.refresh').on('click', function() {
@@ -228,14 +277,22 @@ $(function() {
                 $(this).parent().parent().children().removeClass('active').find('.button').css('display', 'none').removeClass('teal');
                 $(this).parent().addClass('active').find('.button').css('display', 'block').addClass('teal');
                 conclusion_id = $(this).parent().attr('data-id');
+                var check_active = [];
+                $('.patient_info tr').each(function() {
+                   if($(this).hasClass('check_active')) {
+                       check_active.push($(this).attr('data-id'));
+                   }
+                });
                 var data_info = {
                     date_data : $('input[name="daterange"]').val(),
                     client_id : client_id,
+                    check_data : check_active,
                     conclusion_id : conclusion_id
                 };
                 $.cookie('data', JSON.stringify(data_info));
                 var data_rule_id = $(this).parent().attr('data-rule-id');
                 var data_text = $(this).parent().attr('data-text');
+                rule_id = data_rule_id;
 
                 var url = 'books/' + data_text + '/page=1/rel=none';
 
@@ -274,6 +331,9 @@ $(function() {
                 $('.rule_content').text('');
                 $('.topic').html('');
                 $('.book').html('');
+                $('.get_test_data td').each(function() {
+                    $(this).removeClass('opacity_cell');
+                });
             }
         });
 
@@ -414,7 +474,7 @@ $(function() {
                 }else{
                     component = table_data[i].component;
                 }
-                var table_col1 = '<tr><td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
+                var table_col1 = '<tr><td style="background-color:#dbffd4;" data-category="' + table_data[i].category + '">' + component + '</td><td ' + css_value + '>' + table_data[i].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + cnt_row]) == 'string') {
@@ -441,7 +501,7 @@ $(function() {
                 }else{
                     component = table_data[i + cnt_row].component;
                 }
-                var table_col2 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col2 = '<td style="background-color:#dbffd4;" data-category="' + table_data[i + cnt_row].category + '">' + component + '</td><td ' + css_value + '>' + table_data[i + cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
 
             if(jQuery.type(table_data[i + 2 * cnt_row]) == 'string') {
@@ -468,7 +528,7 @@ $(function() {
                 }else{
                     component = table_data[i + 2 * cnt_row].component;
                 }
-                var table_col3 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
+                var table_col3 = '<td style="background-color:#dbffd4;" data-category="' + table_data[i + 2 * cnt_row].category + '">' + component + '</td><td ' + css_value + '>' + table_data[i + 2 * cnt_row].value + '</td><td>' + evaluation + '</td>';
             }
             if(jQuery.type(table_data[i + 3 * cnt_row]) == 'string') {
                 var table_col4 = '<td colspan="3" style="background-color:#ffd9f7;color:#db2828;">' + table_data[i + 3 * cnt_row] + '</td></tr>';
@@ -496,7 +556,7 @@ $(function() {
                 }else{
                     component = table_data[i + 3 * cnt_row].component;
                 }
-                var table_col4 = '<td style="background-color:#dbffd4;">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
+                var table_col4 = '<td style="background-color:#dbffd4;" data-category="' + table_data[i + 3 * cnt_row].category + '">' + component + '</td><td ' + css_value + '>' + table_data[i + 3 * cnt_row].value + '</td><td>' + evaluation + '</td></tr>';
             }
 
             var table = table_col1 + table_col2 + table_col3 + table_col4;
@@ -529,7 +589,7 @@ $(function() {
             var html3 = '<tr class="conclusion_content" data-id="' + conclusion[i].id + '" data-rule-id="' + conclusion_rule_ids + '" data-text="' + conclusion[i].text + '">' +
                 '<td class="content">' + conclusion[i].text + '</td>' +
                     '<td>' +
-                        '<button class="mini ui button" style="display:none;" onclick="moveDetail(' + conclusion[i].id + ')">상세보기</button><br/>' +
+                        '<button class="mini ui button" style="display:none;" onclick="moveDetail([' + conclusion[i].rule_ids + '],' + conclusion[i].id + ')">상세보기</button><br/>' +
                     '</td>' +
                     '<td class="ui right aligned">' +
                         '<div id="is_print" class="ui checkbox">' +
@@ -545,6 +605,7 @@ $(function() {
     function ruleData(data) {
         $('.rule_condition').html('');
         $('.rule_content').html('');
+        var rule_components = [];
 
         if(data.rule.conditions) {
             var condition = data.rule.conditions;
@@ -555,13 +616,18 @@ $(function() {
                 if(i != condition.length - 1) {
                     html4 += '<br/>&&<br/>';
                 }
-
+                var rule_highlight_data = {
+                    component : condition[i].component,
+                    category : condition[i].category
+                };
+                rule_components.push(rule_highlight_data);
                 $('.rule_condition').append(html4);
             }
 
             var content_conclusion = '<span class="rule_conclusion">' + conclusion + '</span>';
 
             $('.rule_content').append(content_conclusion);
+
         }else {
             for(var i = 0; i < data.rule.length; i++) {
                 for(var j = 0; j < data.rule[i].conditions.length; j++) {
@@ -570,6 +636,11 @@ $(function() {
                         html4_ += '<br/>&&<br/>';
                     }
 
+                    var rule_highlight_data_ = {
+                        component : data.rule[i].conditions[j].component,
+                        category : data.rule[i].conditions[j].category
+                    };
+                    rule_components.push(rule_highlight_data_);
                     $('.rule_condition').append(html4_);
                 }
 
@@ -585,6 +656,27 @@ $(function() {
 
             $('.rule_content').append(content_conclusion_);
         }
+
+        var unique_rule_components = [];
+        $.each(rule_components, function(i, e1) {
+            if($.inArray(e1.component, unique_rule_components) === -1) unique_rule_components.push(e1);
+        });
+
+        $('.get_test_data td').each(function() {
+            $(this).addClass('opacity_cell');
+        });
+        $('.get_test_data td').each(function() {
+            for(var i = 0; i < unique_rule_components.length; i++) {
+               if($(this).text() == unique_rule_components[i].component && $(this).attr('data-category') == unique_rule_components[i].category) {
+                   $(this).removeClass('opacity_cell');
+                   $(this).next().removeClass('opacity_cell');
+                   $(this).next().next().removeClass('opacity_cell');
+               }else if($(this).text() == unique_rule_components[i].category) {
+                   $(this).removeClass('opacity_cell');
+               }
+            }
+        });
+
     }
 
     function bookData(data) {
@@ -612,13 +704,12 @@ $(function() {
         }
     }
 
-    function moveDetail(id) {
-        var data_conclusion_id = id;
-
+    function moveDetail(ruld_ids, id) {
         $.persist("home", {
             "html" : $('body').html(),
-            "data_id" : data_id
+            "data_id" : client_id,
+            "date_data" : $('input[name="daterange"]').val()
         });
 
-        window.location.href = '/patient/' + data_id + '/' + data_conclusion_id;
+        window.location.href = '/patient/' + client_id + '/' + id;
     }
