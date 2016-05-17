@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -25,4 +27,4 @@ urlpatterns = [
     url(r'^books/(?P<keyword>.*)/page=(?P<page>\d+)/rel=(?P<rel>.*)$', 'ekp.views.book_list', name='book_list'),
     url(r'^papers/(?P<keyword>.*)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),
     url(r'^book/(?P<keyword>.*)/num=(?P<num>\d+)/rel=(?P<rel>.*)$', 'ekp.views.book_detail', name='book_detail'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
