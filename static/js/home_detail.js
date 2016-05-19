@@ -4,21 +4,20 @@ $(function() {
     $('.final').on('click', function() {
         $('.modal .description').html('');
         var patient_name = $('.modal .name_data').val();
-        var final_conclusion_html_title = '<br/><p>' + patient_name + '님의 검진 결과는 다음과 같습니다.</p><br/>';
+        var final_conclusion_html_title = patient_name + '님의 검진 결과는 다음과 같습니다.\n\n';
 
-        $('.modal .description').append(final_conclusion_html_title);
-        $('tbody.conclusion .conclusion_content').each(function () {
-            if ($(this).find('#is_print').checkbox('is checked')) {
+        $('.modal .description').val($('.modal .description').val() + final_conclusion_html_title);
+        $('tbody.conclusion .conclusion_content').each(function() {
+            if($(this).find('#is_print').checkbox('is checked')) {
                 var conclusion = $(this).find('.content').text();
+                var final_conclusion_html = conclusion + '\n';
 
-                var final_conclusion_html = '<p>' + conclusion + '</p>';
-
-                $('.modal .description').append(final_conclusion_html);
+                $('.modal .description').val($('.modal .description').val() + final_conclusion_html);
             }
         });
 
         $('.ui.modal').modal('show');
-    });
+    })
 
     $('.more-book').on('click', function() {
         var data_text = $('.conclusion_content.active .content').text();
