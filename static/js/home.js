@@ -37,6 +37,7 @@ $(function() {
                 }
             });
         }else if($.cookie('data')) {
+            console.log('a');
             var cookie = $.parseJSON($.cookie('data'));
             $('input[name="daterange"]').val(cookie.date_data);
             $('.patient_info tr .date').each(function() {

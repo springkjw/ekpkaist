@@ -11,25 +11,31 @@
 {% block content %}
     <script type="text/javascript">
         function click_previous() {
-        if($('button.next').hasClass('active')) {
-            $('button.next').removeClass('active');
-            $('.next').removeClass('active');
-            $('.current').addClass('active');
-        }else {
-            $('.previous').addClass('active');
-            $('.current').removeClass('active');
+            $('button.previous').removeClass('disabled');
+            $('button.next').removeClass('disabled');
+            if($('button.next').hasClass('active')) {
+                $('button.next').removeClass('active');
+                $('.next').removeClass('active');
+                $('.current').addClass('active');
+            }else {
+                $('button.previous').addClass('disabled');
+                $('.previous').addClass('active');
+                $('.current').removeClass('active');
+            }
         }
-    }
-    function click_next() {
-        if($('button.previous').hasClass('active')) {
-            $('button.previous').removeClass('active');
-            $('.previous').removeClass('active');
-            $('.current').addClass('active');
-        }else {
-            $('.next').addClass('active');
-            $('.current').removeClass('active');
+        function click_next() {
+            $('button.previous').removeClass('disabled');
+            $('button.next').removeClass('disabled');
+            if($('button.previous').hasClass('active')) {
+                $('button.previous').removeClass('active');
+                $('.previous').removeClass('active');
+                $('.current').addClass('active');
+            }else {
+                $('button.next').addClass('disabled');
+                $('.next').addClass('active');
+                $('.current').removeClass('active');
+            }
         }
-    }
     </script>
 
     <div class="ui main container">
@@ -48,106 +54,33 @@
                     <img class="ui middle aligned image" src="{{ item.book_image_url }}" style="min-width: 100%; max-height: 450px;"/>
                 </div>
                 <div class="ten wide column" style="padding-left: 50px;">
-                    <h1 class="header">{{ item.book_source }}</h1>
-                    <h3 class="metadata">
-                        by <span class="description">{{ item.book_author }}</span>
-                    </h3>
+                    <h1 class="header">{{ item.book_source }}</h1><br/><br/>
+                    <h3 class="header">{{ item.book_author }}</h3>
                     <h4 class="metadata">
                         <strong class="date">{{ item.book_year }}</strong>
                     </h4>
-                    <div class="ui segment" style="margin-top: 50px;">
-                        <h4 class="ui dividing header">
-                            Highlight Keywords
-                        </h4>
-                        <div class="ui grid container">
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui blue basic big empty circular label"></a>
-                                    <span>관찰값</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui orange basic big empty circular label"></a>
-                                    <span>행동</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui teal basic big empty circular label"></a>
-                                    <span>추론과정</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui red basic big empty circular label"></a>
-                                    <span>개체간 영향</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui purple basic big empty circular label"></a>
-                                    <span>이유</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui violet basic big empty circular label"></a>
-                                    <span>치료법</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui green basic big empty circular label"></a>
-                                    <span>설명, 사실</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui pink basic big empty circular label"></a>
-                                    <span>상태 변화</span>
-                                </div>
-                            </div>
-                            <div class="five wide column">
-                                <div class="ui check">
-                                    <a class="ui olive basic big empty circular label"></a>
-                                    <span>진단법</span>
-                                </div>
-                            </div>
+                    <div class="ui clearing divider"></div>
+                    <div class="ui shape">
+                        <div class="sides">
+                            <p class="previous side content">{{ item.book_previous_contents }}</p>
+                            <p class="current active side content">{{ item.book_contents }}</p>
+                            <p class="next side content">{{ item.book_next_contents }}</p>
                         </div>
                     </div>
-                </div>
-                <script>
-                    $('.check').on('click', function() {
-                        if($(this).children('a').hasClass('basic')) {
-                            $(this).children('a').removeClass('basic');
-                        }else {
-                            $(this).children('a').addClass('basic');
-                        }
+                    <div class="ui clearing divider"></div>
+                            <div class="ui two column centered grid" style="margin-bottom: 50px;">
+                        <div class="four column centered row">
+                            <button class="ui blue basic left labeled icon button previous" style="margin-right: 10px;" onclick="click_previous();">
+                                <i class="left arrow icon"></i>
+                                이전 문단
+                            </button>
+                            <button class="ui blue right labeled icon button next" onclick="click_next();">
+                                <i class="right arrow icon"></i>
+                                다음 문단
+                            </button>
 
-                    });
-                </script>
-            </div>
-            <div class="ui clearing divider"></div>
-            <div class="ui shape">
-                <div class="sides">
-                    <p class="previous side content">{{ item.book_previous_contents }}</p>
-                    <p class="current active side content">{{ item.book_contents }}</p>
-                    <p class="next side content">{{ item.book_next_contents }}</p>
-                </div>
-            </div>
-            <div class="ui clearing divider"></div>
-            <div class="ui two column centered grid" style="margin-bottom: 50px;">
-                <div class="four column centered row">
-                    <button class="ui blue basic left labeled icon button previous" style="margin-right: 10px;" onclick="click_previous();">
-                        <i class="left arrow icon"></i>
-                        이전 문단
-                    </button>
-                    <button class="ui blue right labeled icon button next" onclick="click_next();">
-                        <i class="right arrow icon"></i>
-                        다음 문단
-                    </button>
-
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endfor %}

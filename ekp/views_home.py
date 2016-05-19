@@ -4,7 +4,6 @@ from django.http import HttpResponse, JsonResponse
 import json
 import urllib2
 import urllib
-import ast
 def home(request):
     url = 'http://kecidev.kaist.ac.kr:50000/cases?limit=30'
     query = urllib2.urlopen(url).read()
