@@ -105,13 +105,27 @@ def home_patient(request, patient, rule):
     obj_data_ = []
     if len(rule_ids) != 1:
         serialized_obj_rule_data = []
-        for i in range(0, len(rule_ids)):
+        for i in xrange(0, len(rule_ids)):
             url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + str(rule_ids[i])
             query_rule_data = urllib2.urlopen(url_rule_data).read()
             serialized_obj_rule_data.append(json.loads(query_rule_data))
 
-        for i in range(0, len(serialized_obj_rule_data)):
+        for i in xrange(0, len(serialized_obj_rule_data)):
             object_data = serialized_obj_rule_data[i]['conditions']
+            for obj in object_data:
+                obj_data.append(obj['component'])
+
+        obj_data = list(set(obj_data))
+
+        for item in serialized_obj_rule_data:
+            for i in item['conditions']:
+                for j in obj_data:
+                    if i['component'] is j:
+                        data_ = {
+                            'component' : j,
+                            'attritube' : i['attribute']
+                        }
+                        obj_data_.append(data_)
 
     else:
         url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + rule
@@ -153,8 +167,6 @@ def home_patient(request, patient, rule):
             'topics': [],
             'total_doc': 0
         }
-
-    print type(serialized_obj_rule_data)
 
     template = 'home_patient.html'
     context = {

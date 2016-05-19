@@ -211,7 +211,7 @@
                                 <div class="result ui centered grid">
                                     {% for item in obj_data %}
                                         {% for obj in test.tests %}
-                                            {% if obj.component == item.component and obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
+                                            {% if obj.component == item.component %}
                                                 <div class="result_active six wide column" style="margin-left:10px;">
                                                     <table class="ui celled table">
                                                         <tbody>
@@ -293,22 +293,29 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div class="graph six wide column">
-                                                    <div class="mark" data-value="{{ obj.value }}">
-                                                        <i class="dropdown icon"></i>
-                                                        <span>{{ obj.value }}</span>
+                                                {% if obj.evaluation != None and obj.low != 'OCO' and obj.high != 'OCO' %}
+                                                    <div class="graph six wide column">
+                                                        <div class="mark" data-value="{{ obj.value }}">
+                                                            <i class="dropdown icon"></i>
+                                                            <span>{{ obj.value }}</span>
+                                                        </div>
+                                                        <div class="min" data-value="{{ obj.low }}">
+                                                        </div>
+                                                        <div class="average" data-value="{{  obj.high }}">
+                                                        </div>
+                                                        <div class="max">
+                                                        </div>
                                                     </div>
-                                                    <div class="min" data-value="{{ obj.low }}">
+                                                    <div class="three wide column">
+                                                        <p>Low : {{ obj.low }}</p>
+                                                        <p>High : {{ obj.high }}</p>
                                                     </div>
-                                                    <div class="average" data-value="{{  obj.high }}">
+                                                {% else %}
+                                                    <div class="graph six wide column">
                                                     </div>
-                                                    <div class="max">
+                                                    <div class="three wide column">
                                                     </div>
-                                                </div>
-                                                <div class="three wide column">
-                                                    <p>Low : {{ obj.low }}</p>
-                                                    <p>High : {{ obj.high }}</p>
-                                                </div>
+                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
