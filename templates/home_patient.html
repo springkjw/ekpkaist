@@ -58,12 +58,14 @@
         });
 
         $('tbody.patient_info tr').on('click', function() {
-            var data_info = {
+            var data = {
                 date_data : $('input[name="daterange"]').val(),
-                client_id : '{{ patient }}',
-                check_data : []
+                client_id : $(this).attr('data-id'),
             };
-            $.cookie('data_patient', JSON.stringify(data_info));
+
+            $.cookie.json = true;
+            $.cookie('data_', data, { path : '/' });
+
             $(location).attr('href', '/');
         });
 

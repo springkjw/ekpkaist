@@ -5,6 +5,7 @@ var rule_id = '';
 
 $(function() {
         var data = $.persist('home');
+        var data_ = $.cookie('data_');
         if(data) {
             data_id = data.data_id;
             $('body').html(data.html);
@@ -36,36 +37,30 @@ $(function() {
                     $('.age_data').val(age);
                 }
             });
-        }else if($.cookie('data')) {
-            console.log('a');
-            var cookie = $.parseJSON($.cookie('data'));
-            $('input[name="daterange"]').val(cookie.date_data);
+        }else if(data_) {
+            data_ = $.parseJSON(data_);
+            var date_data_ = data_.date_data;
+            var data_id_ = data_.client_id;
+
+            $('input[name="daterange"]').val(date_data_);
             $('.patient_info tr .date').each(function() {
-                if($(this).text() == cookie.date_data) {
+                if($(this).text() == date_data_) {
                     $(this).parent().css('display', 'table-row');
-                    if($(this).parent().attr('data-id') == cookie.client_id) {
-                        $(this).parent().addClass('active');
-                    }
                 }else {
                     $(this).parent().css('display', 'none');
                 }
             });
-
             $('.patient_info tr').each(function() {
-                for(var i = 0; i < cookie.check_data.length; i++) {
-                    if(cookie.check_data[i] == $(this).attr('data-id')) {
-                        $(this).addClass('check_active').removeClass('active');
-                    }
+                if($(this).attr('data-id') == data_id_) {
+                    $(this).addClass('active');
                 }
             });
-
             $.ajax({
                 url : '/',
                 data : {
-                    id: cookie.client_id
+                    id: data_id_
                 },
                 success : function(data) {
-                    //var record_date = data.patient_data.recorded_date;
                     client_id = data.patient_data.id;
                     var hospital = data.patient_data.clinic.name;
                     var office = data.patient_data.office.name;
@@ -89,19 +84,10 @@ $(function() {
 
                     getTest(data);
                     conclusion(data);
-
-                    $('.conclusion tr').each(function() {
-                        if($(this).attr('data-id') == cookie.conclusion_id) {
-                            $(this).find('.content').trigger('click');
-                        }
-                    });
-
-                    $.removeCookie('data');
+                    $('.conclusion').css('display', '');
+                    $.removeCookie('data_', { path : '/' });
                 }
             });
-
-            $('.conclusion').css('display', '');
-
         }else{
             alert('접수 일자를 선택해 주세요.');
         }
@@ -238,6 +224,14 @@ $(function() {
 
                 data_id = $(this).attr('data-id');
 
+                var data = {
+                    date_data : $('input[name="daterange"]').val(),
+                    client_id : $(this).attr('data-id'),
+                };
+
+                $.cookie.json = true;
+                $.cookie('data_', data, { path : '/' });
+
                 $.ajax({
                     url : '/',
                     data : {
@@ -284,13 +278,7 @@ $(function() {
                        check_active.push($(this).attr('data-id'));
                    }
                 });
-                var data_info = {
-                    date_data : $('input[name="daterange"]').val(),
-                    client_id : client_id,
-                    check_data : check_active,
-                    conclusion_id : conclusion_id
-                };
-                $.cookie('data', JSON.stringify(data_info));
+
                 var data_rule_id = $(this).parent().attr('data-rule-id');
                 var data_text = $(this).parent().attr('data-text');
                 rule_id = data_rule_id;
@@ -705,11 +693,15 @@ $(function() {
     }
 
     function moveDetail(ruld_ids, id) {
-        $.persist("home", {
-            "html" : $('body').html(),
-            "data_id" : client_id,
-            "date_data" : $('input[name="daterange"]').val()
-        });
+        if(client_id != '' && id != '') {
+            $.persist("home", {
+                "html": $('body').html(),
+                "data_id": client_id,
+                "date_data": $('input[name="daterange"]').val()
+            });
 
-        window.location.href = '/patient/' + client_id + '/' + id;
+            window.location.href = '/patient/' + client_id + '/' + id;
+        }else {
+            alert('환자 및 소견 정보를 불러오고 있습니다 잠시만 기다려주세요.');
+        }
     }
