@@ -38,6 +38,7 @@ def home(request):
                     query_rule_data = urllib2.urlopen(url_rule_data).read()
                     serialized_obj_rule_data.append(json.loads(query_rule_data))
             else:
+                print request.GET['rule_id']
                 url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
 
                 query_rule_data = urllib2.urlopen(url_rule_data).read()
@@ -127,7 +128,7 @@ def home_patient(request, patient, rule):
                         obj_data_.append(data_)
 
     else:
-        url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + rule
+        url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + str(rule_ids[0])
         query_rule_data = urllib2.urlopen(url_rule_data).read()
         serialized_obj_rule_data = json.loads(query_rule_data)
 
