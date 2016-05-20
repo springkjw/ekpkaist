@@ -18,13 +18,15 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from .views_home import home, home_patient
+from .views import book_list, book_detail, paper_list
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', 'ekp.views_home.home', name='home'),
-    url(r'^patient/(?P<patient>\d+)/(?P<rule>\d+)$', 'ekp.views_home.home_patient', name='home_patient'),
+    url(r'^$', home, name='home'),
+    url(r'^patient/(?P<patient>\d+)/(?P<rule>\d+)$', home_patient, name='home_patient'),
 
-    url(r'^books/(?P<keyword>.*)/page=(?P<page>\d+)/rel=(?P<rel>.*)$', 'ekp.views.book_list', name='book_list'),
-    url(r'^papers/(?P<keyword>.*)/page=(?P<page>\d+)$', 'ekp.views.paper_list', name='paper_list'),
-    url(r'^book/(?P<keyword>.*)/num=(?P<num>\d+)/rel=(?P<rel>.*)$', 'ekp.views.book_detail', name='book_detail'),
+    url(r'^books/(?P<keyword>.*)/page=(?P<page>\d+)/rel=(?P<rel>.*)$', book_list, name='book_list'),
+    url(r'^papers/(?P<keyword>.*)/page=(?P<page>\d+)$', paper_list, name='paper_list'),
+    url(r'^book/(?P<keyword>.*)/num=(?P<num>\d+)/rel=(?P<rel>.*)$', book_detail, name='book_detail'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

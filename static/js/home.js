@@ -164,12 +164,12 @@ $(function() {
                     var rule_id_ = rule_id.split(',');
                     for(var i = 0; i < rule_id_.length; i++) {
                         newName = 'rds' + rule_id_[i];
-                        var descriptive_url_ = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&ruleId=' + rule_id_[i];
+                        var descriptive_url_ = 'http://143.248.91.197:8080/front/reasoning.jsp?params=' + client_id + '&params=' + rule_id_[i];
                         window.open(descriptive_url_, newName);
                     }
                 }else{
                     var descriptive_url;
-                    descriptive_url = 'http://ekp.kaist.ac.kr/rdr-web/index.htm?clientId=' + client_id + '&ruleId=' + rule_id;
+                    descriptive_url = 'http://143.248.91.197:8080/front/reasoning.jsp?params=' + client_id + '&params=' + rule_id;
                     window.open(descriptive_url);
                 }
             }
