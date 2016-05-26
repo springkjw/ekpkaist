@@ -2,6 +2,7 @@ var data_id = '';
 var client_id = '';
 var conclusion_id = '';
 var rule_id = '';
+var check_list = [];
 
 $(function() {
         var data = $.persist('home');
@@ -52,7 +53,7 @@ $(function() {
             });
             $('.patient_info tr').each(function() {
                 if($(this).attr('data-id') == data_id_) {
-                    $(this).addClass('active');
+                    $(this).addClass('active _current');
                 }
             });
             $.ajax({
@@ -100,6 +101,22 @@ $(function() {
         }else{
             alert('접수 일자를 선택해 주세요.');
         }
+
+    if($.cookie('data_check')) {
+        var c_data = $.parseJSON($.cookie('data_check'));
+        check_list = c_data.check_list;
+        $('.patient_info tr').each(function () {
+            for (var i = 0; i < check_list.length; i++) {
+                if ($(this).attr('data-id') == check_list[i]) {
+                    $(this).addClass('check_active');
+                    $(this).removeClass('active');
+                }
+            }
+
+        });
+
+        $.removeCookie('data_check', {path: '/'});
+    }
 
         $('input[name="daterange"]').daterangepicker(
             {
@@ -197,6 +214,23 @@ $(function() {
                 $(this).text('최종확인');
             }else if(!check_test && !is_active) {
                 alert('환자를 선택해주세요.');
+            }
+
+            var final_check_list = [];
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('check_active')) {
+                    final_check_list.push($(this).attr('data-id'));
+                }
+            });
+
+            if(final_check_list.length !== 0) {
+                $.removeCookie('data_check', {path: '/'});
+                var data = {
+                    check_list: final_check_list
+                };
+
+                $.cookie.json = true;
+                $.cookie('data_check', data, {path: '/'});
             }
         });
 
@@ -696,6 +730,24 @@ $(function() {
                 "data_id": client_id,
                 "date_data": $('input[name="daterange"]').val()
             });
+
+            var final_check_list = [];
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('check_active')) {
+                    final_check_list.push($(this).attr('data-id'));
+                }
+            });
+
+            if(final_check_list.length !== 0) {
+                $.removeCookie('data_check', {path: '/'});
+                var data_c = {
+                    check_list: final_check_list
+                };
+
+                $.cookie.json = true;
+                $.cookie('data_check', data_c, {path: '/'});
+            }
+
 
             window.location.href = '/patient/' + client_id + '/' + id;
         }else {

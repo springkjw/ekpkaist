@@ -8,12 +8,35 @@
 
 {% block content %}
 <script type="text/javascript">
+    var check_list = [];
     $(function() {
+        if($.cookie('data_check')) {
+            var c_data = $.parseJSON($.cookie('data_check'));
+            check_list = c_data.check_list;
+        }
+
         $('.patient_info tr').each(function() {
             if($(this).attr('data-id') == '{{ patient }}') {
-               $(this).addClass('active');
+               $(this).addClass('active _current');
+            }
+            for(var i = 0; i < check_list.length; i++) {
+                if($(this).attr('data-id') == check_list[i]) {
+                    $(this).addClass('check_active');
+                    $(this).removeClass('active');
+                }
             }
         });
+
+        $('.patient_info tr').each(function() {
+            if($(this).attr('data-id') == '{{ patient }}') {
+                if($(this).hasClass('check_active')) {
+                    $('.final_check').text('확인취소');
+                    $('.icon_final').addClass('teal').removeClass('disabled');
+                }
+            }
+        });
+
+        $.removeCookie('data_check', {path: '/'});
 
         var now = new Date();
         $('.current_data').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
@@ -66,6 +89,23 @@
 
             $.cookie.json = true;
             $.cookie('data_', data, { path : '/' });
+
+            var final_check_list = [];
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('check_active')) {
+                    final_check_list.push($(this).attr('data-id'));
+                }
+            });
+
+            if(final_check_list.length !== 0) {
+                $.removeCookie('data_check', {path: '/'});
+                var data_c = {
+                    check_list: final_check_list
+                };
+
+                $.cookie.json = true;
+                $.cookie('data_check', data_c, {path: '/'});
+            }
 
             $(location).attr('href', '/');
         });

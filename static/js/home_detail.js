@@ -60,4 +60,64 @@ $(function() {
         $('.result').append(html_result);
     }
 
+    $('.final_check').on('click', function() {
+            var check_test = false;
+            var is_active = false;
+
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('active')) {
+                    is_active = true;
+                }else if($(this).hasClass('check_active')) {
+                    check_test =  true;
+                }
+            });
+            if(is_active) {
+                $('.icon_final').removeClass('disabled').addClass('teal');
+                $('.patient_info .active').removeClass('active').addClass('check_active');
+                $(this).text('확인취소');
+            }else if(check_test && !is_active) {
+                $('.icon_final').addClass('disabled').removeClass('teal');
+                $('.patient_info ._current').addClass('active').removeClass('check_active');
+                $(this).text('최종확인');
+            }else if(!check_test && !is_active) {
+                alert('환자를 선택해주세요.');
+            }
+
+            var final_check_list = [];
+            $('.patient_info tr').each(function() {
+                if($(this).hasClass('check_active')) {
+                    final_check_list.push($(this).attr('data-id'));
+                }
+            });
+
+            if(final_check_list.length !== 0) {
+                $.removeCookie('data_check', {path: '/'});
+                var data = {
+                    check_list: final_check_list
+                };
+
+                $.cookie.json = true;
+                $.cookie('data_check', data, {path: '/'});
+            }
+        });
+
+    $(window).unload(function() {
+        var final_check_list = [];
+        $('.patient_info tr').each(function() {
+            if($(this).hasClass('check_active')) {
+                final_check_list.push($(this).attr('data-id'));
+            }
+        });
+
+        if(final_check_list.length !== 0) {
+            $.removeCookie('data_check', {path: '/'});
+            var data_c = {
+                check_list: final_check_list
+            };
+
+            $.cookie.json = true;
+            $.cookie('data_check', data_c, {path: '/'});
+        }
+    });
+
 });
