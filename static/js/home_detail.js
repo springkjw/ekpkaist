@@ -2,7 +2,7 @@ $(function() {
     $('.ui.dropdown').dropdown();
 
     $('.final').on('click', function() {
-        $('.modal .description').html('');
+        $('.modal textarea').val('');
         var patient_name = $('.modal .name_data').val();
         var final_conclusion_html_title = patient_name + '님의 검진 결과는 다음과 같습니다.\n\n';
 
@@ -10,6 +10,8 @@ $(function() {
         $('tbody.conclusion .conclusion_content').each(function() {
             if($(this).find('#is_print').checkbox('is checked')) {
                 var conclusion = $(this).find('.content').text();
+                conclusion = conclusion.replace('                                                ', '');
+                conclusion = conclusion.replace(/[\t\n]+/g,' ');
                 var final_conclusion_html = conclusion + '\n';
 
                 $('.modal .description').val($('.modal .description').val() + final_conclusion_html);
@@ -17,7 +19,7 @@ $(function() {
         });
 
         $('.ui.modal').modal('show');
-    })
+    });
 
     $('.more-book').on('click', function() {
         var data_text = $('.conclusion_content.active .content').text();

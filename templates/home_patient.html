@@ -58,6 +58,7 @@
         });
 
         $('tbody.patient_info tr').on('click', function() {
+            $.removeCookie('data_', { path : '/' });
             var data = {
                 date_data : $('input[name="daterange"]').val(),
                 client_id : $(this).attr('data-id'),
@@ -70,6 +71,7 @@
         });
 
         $('.move_back').click(function(){
+            $.removeCookie('data_', { path : '/' });
             var conclusion_id = $(this).parent().parent().attr('data-id');
 
             var data_info = {
@@ -79,8 +81,8 @@
                 conclusion_id : conclusion_id
             };
 
-            $.cookie('data', JSON.stringify(data_info));
-
+            $.cookie.json = true;
+            $.cookie('data_', data_info, { path : '/' });
             $(location).attr('href', '/');
 	    });
 
@@ -159,14 +161,14 @@
     }
 </script>
 <div class="ui main" style="margin: 0 10px 0 10px;">
-    <a href="{% url 'home' %}" style="color: inherit;"><h3>종합보기</h3></a> / <a href="#" style="color: inherit;"><h2>상세보기</h2></a>
+    <a href="{% url 'home' %}" style="color: inherit;"><h3>메인화면</h3></a> / <a href="#" style="color: inherit;"><h2>상세화면</h2></a>
     <br/>
     <br/>
     <div class="ui  grid ">
         <div class="sixteen column">
             <table class="ui table">
                 <tr>
-                    <td class="two   center aligned" style="background-color:#00b5ad;color:white;"><strong>환자 정보</strong></td>
+                    <td class="two center aligned" style="background-color:#00b5ad;color:white;"><strong>환자 정보</strong></td>
                     <td class="record_date two wide center aligned">접수 일자 - <input type="text" class="record_date_data ui basic label center aligned" id='daterange' name="daterange" readonly value="   " style="width:100px !important;"/></td>
                     <td class="hospital two  center aligned">병원명 - <input class="hospital_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
                     <td class="ofiice two  center aligned">영업소 - <input class="office_data ui basic label center aligned" readonly value="   " style="width:100px !important;"/></td>
@@ -179,7 +181,7 @@
         </div>
     </div>
     <div class="ui relaxed grid">
-        <div class="two wide column" style="height:900px; overflow:scroll;">
+        <div class="two wide column" style="height:1000px; overflow:scroll;">
             <table class="ui compact  center aligned table">
                 <thead>
                     <tr>
@@ -207,7 +209,7 @@
                     <div class="ui grid">
                         <div class="ui segments sixteen wide column" style="height:400px;margin-top:15px;overflow:scroll;padding: 0;">
                             <div class="ui teal inverted segment" style="min-height:58px;">
-                                <h4>검사결과</h4>
+                                <h4 style="margin-top:4px;">검사결과</h4>
                             </div>
                             <div class="ui container" style="margin-top:15px;">
                                 <div class="result ui centered grid">
@@ -328,7 +330,7 @@
                             <div class="ui teal inverted segment">
                                 <div class="ui right aligned grid">
                                     <div class="right floated left aligned six wide column">
-                                        <h4>소견 생성 규칙</h4>
+                                        <h4 style="margin-top:4px;">소견 생성 규칙</h4>
                                     </div>
                                     <div class="ten wide column">
                                         <button class="tiny ui inverted button descriptive">상세설명</button>
@@ -453,7 +455,7 @@
                             <div class="ui teal inverted segment">
                                 <div class="right aligned ui grid">
                                     <div class=" right floated left aligned ten wide column" >
-                                        <h4>지표 - 진단 그래프</h4>
+                                        <h4 style="margin-top:4px;">지표 - 진단 그래프</h4>
                                     </div>
                                     <div class="six wide column">
                                         <button class="expand_img tiny ui inverted button">크게 보기</button>
@@ -470,7 +472,7 @@
                             <thead>
                                 <tr>
                                     <th style="background-color:#00b5ad;color:white;">관련 의학 자료</th>
-                                    <th class="right aligned" style="background-color:#00b5ad;color:white;"><a href="#" class="more-book"><button class="tiny ui inverted button">더 알아보기</button></a></th>
+                                    <th class="right aligned" style="background-color:#00b5ad;color:white;"><a href="#" class="more-book"><button class="tiny ui inverted button">전체 결과</button></a></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -525,7 +527,7 @@
 </div>
 <div class="ui modal">
     <i class="close icon"></i>
-    <div class="header" style="background: #00b5ad; color:white;">
+    <div class="header" style="height:120px; padding-top:50px; background: #00b5ad; color:white;">
         최종 소견
     </div>
     <div class="content">
@@ -545,14 +547,13 @@
     </div>
     <div class="ui form">
         <div class="field">
-            <label for="final"></label>
-            <textarea name="final" class="description"></textarea>
+            <textarea name="final" class="description" style="line-height: 1.5em; "></textarea>
         </div>
     </div>
     </div>
     <div class="actions">
         <div class="ui black deny button">
-            편집
+            저장
         </div>
         <div class="ui black deny button">
             인쇄

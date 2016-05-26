@@ -85,6 +85,15 @@ $(function() {
                     getTest(data);
                     conclusion(data);
                     $('.conclusion').css('display', '');
+
+                    if(data_.conclusion_id) {
+                        $('.conclusion .conclusion_content').each(function() {
+                            if($(this).attr('data-id') == data_.conclusion_id) {
+                                $(this).children('.content').trigger('click');
+                            }
+                        });
+                    }
+
                     $.removeCookie('data_', { path : '/' });
                 }
             });
@@ -372,7 +381,7 @@ $(function() {
     });
 
     $('.final').on('click', function() {
-        $('.modal .description').html('');
+        $('.modal textarea').val('');
         var patient_name = $('.modal .name_data').val();
         var final_conclusion_html_title = patient_name + '님의 검진 결과는 다음과 같습니다.\n\n';
 
@@ -387,7 +396,7 @@ $(function() {
         });
 
         $('.ui.modal').modal('show');
-    })
+    });
 
 });
 
@@ -406,18 +415,6 @@ $(function() {
         $.each(category, function(i, e1) {
             if($.inArray(e1, sorted_category) === -1) {
                 sorted_category.push(e1);
-            }else{
-                if($.inArray('null' , sorted_category) === -1) {
-                    sorted_category.push('null');
-                }
-            }
-        });
-
-        $.each(category, function(i, e1) {
-            if($.inArray(e1, sorted_category) !== -1) {
-                if($.inArray('null' , sorted_category) === -1) {
-                    sorted_category.push('null');
-                }
             }
         });
 
@@ -673,8 +670,8 @@ $(function() {
         var book = data.book
         var topic = book.topics;
         var books = book.books;
-
-        if(topic.length != 0 && books.length != 0) {
+        console.log(data);
+        if(books.length != 0) {
             for (var i = 0; i < topic.length; i++) {
                 var html5 = '<a href="#" class="ui label" style="margin: 5px;"><span class="keyword">' + topic[i].topic_title + '</span></a>';
 
