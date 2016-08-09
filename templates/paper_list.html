@@ -1,87 +1,115 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block javascript %}
+<script type="text/javascript">
+    $(function () {
+        $('.title').on('click', function () {
+            var pmc_id = $(this).attr('data-id');
+//          TO-DO: CORS 이슈
+            $.ajax({
+                method: 'POST',
+                url: 'http://ekp.kaist.ac.kr/apis/putClicksonDoc/' + pmc_id,
+                data: {
+                    csrfmiddlewaretoken: $(this).parent().find('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function (data) {
+
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
-    <div class="ui main container">
-        <div class="ui center aligned">
-            {% for obj in object.topics %}
-                <a href="#" class="ui label" style="margin: 5px;">
-                    <span class="keyword">{{ obj.topic_title }}</span>
-                    <i class="delete icon"></i>
-                </a>
+<div class="ui main container">
+    <div class="ui center aligned">
+        {% for obj in object.topics %}
+        <a href="#" class="ui label" style="margin: 5px;">
+            <span class="keyword">{{ obj.topic_title }}</span>
+            <i class="delete icon"></i>
+        </a>
+        {% endfor %}
+    </div>
+    <div class="ui two column centered grid" style="margin-top:20px;">
+        <div class="column">
+            <div class="ui fluid search">
+                <div class="ui fluid icon input">
+                    <input class="prompt" type="text" placeholder="Search..."
+                           onkeypress="if(event.keyCode==13) {button_click(); return false;}">
+                    <i class="search icon" onclick="button_click();"></i>
+                </div>
+                <div class="results"></div>
+            </div>
+        </div>
+    </div>
+    <div class="ui grid">
+        <div class="right floated left aligned three wide column">
+            <div class="ui selection dropdown">
+                <input type="hidden" name="정렬기준">
+                <i class="dropdown icon"></i>
+                <div class="default text">정렬 기준</div>
+                <div class="menu">
+                    <div class="item" data-value="1">관찰값</div>
+                    <div class="item" data-value="0">개체간 영향</div>
+                    <div class="item" data-value="0">설명, 사실</div>
+                    <div class="item" data-value="0">행동</div>
+                    <div class="item" data-value="0">이유</div>
+                    <div class="item" data-value="0">상태변화</div>
+                    <div class="item" data-value="0">추론 과정</div>
+                    <div class="item" data-value="0">치료법</div>
+                    <div class="item" data-value="0">진단법</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui top attached tabular menu">
+        <a class="item" data-tab="book" href="{% url 'book_list' keyword=keyword page=1 rel='none' %}">
+            Book ({{ book.total_doc }})</a>
+        <a class="active item" data-tab="article">Article ({{ object.total_doc }})</a>
+    </div>
+    <div class="ui bottom attached active tab segment">
+        <div class="ui divided items">
+            {% for item in object.journals %}
+            <div class="item">
+                <div class="middle aligned content">
+                    {% csrf_token %}
+                    <a class="header title" onclick="window.open('{{ item.pmc_url }}');" data-id="{{ item.pmc_id}}">
+                        {{ item.title }}</a>
+                    <div class="metadata">
+                        <span class="description">{{ item.author }}</span><br/>
+                        <span class="date">{{ item.journal_title}} , {{ item.date }}</span>
+                    </div>
+                    <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
+                        {{ item.highlighted_contents|safe }}
+                    </div>
+                </div>
+            </div>
             {% endfor %}
         </div>
-        <div class="ui two column centered grid" style="margin-top:20px;">
-            <div class="column">
-                <div class="ui fluid search">
-                    <div class="ui fluid icon input">
-                        <input class="prompt" type="text" placeholder="Search..." onkeypress="if(event.keyCode==13) {button_click(); return false;}">
-                        <i class="search icon" onclick="button_click();"></i>
-                    </div>
-                    <div class="results"></div>
-                </div>
-            </div>
-        </div>
-        <div class="ui grid">
-            <div class="right floated left aligned three wide column">
-                <div class="ui selection dropdown">
-                    <input type="hidden" name="정렬기준">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">정렬 기준</div>
-                    <div class="menu">
-                        <div class="item" data-value="1">관찰값</div>
-                        <div class="item" data-value="0">개체간 영향</div>
-                        <div class="item" data-value="0">설명, 사실</div>
-                        <div class="item" data-value="0">행동</div>
-                        <div class="item" data-value="0">이유</div>
-                        <div class="item" data-value="0">상태변화</div>
-                        <div class="item" data-value="0">추론 과정</div>
-                        <div class="item" data-value="0">치료법</div>
-                        <div class="item" data-value="0">진단법</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ui top attached tabular menu">
-            <a class="item" data-tab="book" href="{% url 'book_list' keyword=keyword page=1 rel='none' %}">Book ({{ book.total_doc }})</a>
-            <a class="active item" data-tab="article">Article ({{ object.total_doc }})</a>
-        </div>
-        <div class="ui bottom attached active tab segment">
-            <div class="ui divided items">
-                {% for item in object.journals %}
-                    <div class="item">
-                        <div class="middle aligned content">
-                            <a class="header" onclick="window.open('{{ item.pmc_url }}');">{{ item.title }}</a>
-                            <div class="metadata">
-                                <span class="description">{{ item.author }}</span><br/>
-                                <span class="date">{{ item.journal_title}} , {{ item.date }}</span>
-                            </div>
-                            <div class="ui contents" style="padding-top:15px; padding-bottom: 10px;">
-                                {{ item.highlighted_contents|safe }}
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="ui center aligned grid">
+    </div>
+    <div class="ui center aligned grid">
         <div class="ui column grid" style="margin:20px;">
             <div class="column">
                 {% if not count_1 == 0 %}
-                    <a href="{% url 'paper_list' keyword=keyword page=count_1|add:-9 %}"><i class="chevron left icon"></i></a>
+                <a href="{% url 'paper_list' keyword=keyword page=count_1|add:-9 %}"><i
+                        class="chevron left icon"></i></a>
                 {% endif %}
                 <div class="ui pagination menu">
                     {% for i in range %}
-                        <a href="{% url 'paper_list' keyword=keyword page=i %}" class="item {% if i == page %}active{% endif %}">
-                            {{ i }}
-                        </a>
+                    <a href="{% url 'paper_list' keyword=keyword page=i %}"
+                       class="item {% if i == page %}active{% endif %}">
+                        {{ i }}
+                    </a>
                     {% endfor %}
                 </div>
                 {% if not count_mod == count_data %}
-                    <a href="{% url 'paper_list' keyword=keyword page=count_2|add:1 %}"><i class="chevron right icon"></i></a>
+                <a href="{% url 'paper_list' keyword=keyword page=count_2|add:1 %}"><i
+                        class="chevron right icon"></i></a>
                 {% endif %}
             </div>
         </div>
-        </div>
     </div>
+</div>
 {% endblock %}

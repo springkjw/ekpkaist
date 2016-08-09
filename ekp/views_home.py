@@ -9,7 +9,7 @@ import urllib
 # 종합보기 view
 def home(request):
     # 환자 데이터 30개 가져오기
-    url = 'http://kecidev.kaist.ac.kr:50000/cases?limit=30'
+    url = 'http://ekp.kaist.ac.kr:50000/cases?limit=30'
     query = urllib2.urlopen(url).read()
 
     # 환자 데이터 serialize
@@ -19,11 +19,11 @@ def home(request):
         # 환자 클릭 시 진단 결과 데이터 가져오기
         if(request.GET.get('id', False)):
             # case 데이터
-            url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id']
+            url_data = 'http://ekp.kaist.ac.kr:50000/cases/' + request.GET['id']
             # test 데이터
-            url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/tests"
+            url_test_data = 'http://ekp.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/tests"
             # conclusion 데이터
-            url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/conclusions"
+            url_conclusion_data = 'http://ekp.kaist.ac.kr:50000/cases/' + request.GET['id'] + "/conclusions"
 
             # 각 데이터 query
             query_data = urllib2.urlopen(url_data).read()
@@ -49,12 +49,12 @@ def home(request):
                 # 각 rule을 저장
                 serialized_obj_rule_data = []
                 for ids in request.GET['rule_id'].split(','):
-                    url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + ids
+                    url_rule_data = 'http://ekp.kaist.ac.kr:50000/rules/' + ids
                     query_rule_data = urllib2.urlopen(url_rule_data).read()
                     serialized_obj_rule_data.append(json.loads(query_rule_data))
             # rule이 하나인 경우
             else:
-                url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
+                url_rule_data = 'http://ekp.kaist.ac.kr:50000/rules/' + request.GET['rule_id']
 
                 query_rule_data = urllib2.urlopen(url_rule_data).read()
                 serialized_obj_rule_data = json.loads(query_rule_data)
@@ -97,15 +97,15 @@ def home(request):
 
 # 상세보기 view
 def home_patient(request, patient, rule):
-    url = 'http://kecidev.kaist.ac.kr:50000/cases?limit=30'
+    url = 'http://ekp.kaist.ac.kr:50000/cases?limit=30'
     query = urllib2.urlopen(url).read()
 
     serialized_obj = json.loads(query)
 
     # 특정 환자에 대한 case, test, conclusion, rule, book 데이터 가져오기
-    url_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient
-    url_test_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/tests"
-    url_conclusion_data = 'http://kecidev.kaist.ac.kr:50000/cases/' + patient + "/conclusions"
+    url_data = 'http://ekp.kaist.ac.kr:50000/cases/' + patient
+    url_test_data = 'http://ekp.kaist.ac.kr:50000/cases/' + patient + "/tests"
+    url_conclusion_data = 'http://ekp.kaist.ac.kr:50000/cases/' + patient + "/conclusions"
 
     query_data = urllib2.urlopen(url_data).read()
     query_test_data = urllib2.urlopen(url_test_data).read()
@@ -126,7 +126,7 @@ def home_patient(request, patient, rule):
     if len(rule_ids) != 1:
         serialized_obj_rule_data = []
         for i in xrange(0, len(rule_ids)):
-            url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + str(rule_ids[i])
+            url_rule_data = 'http://ekp.kaist.ac.kr:50000/rules/' + str(rule_ids[i])
             query_rule_data = urllib2.urlopen(url_rule_data).read()
             serialized_obj_rule_data.append(json.loads(query_rule_data))
 
@@ -148,7 +148,7 @@ def home_patient(request, patient, rule):
                         obj_data_.append(data_)
     # rule이 하나인 경우
     else:
-        url_rule_data = 'http://kecidev.kaist.ac.kr:50000/rules/' + str(rule_ids[0])
+        url_rule_data = 'http://ekp.kaist.ac.kr:50000/rules/' + str(rule_ids[0])
         query_rule_data = urllib2.urlopen(url_rule_data).read()
         serialized_obj_rule_data = json.loads(query_rule_data)
 

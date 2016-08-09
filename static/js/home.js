@@ -5,12 +5,21 @@ var rule_id = '';
 var check_list = [];
 
 $(function() {
+        // persist: eg.js 기능 html 데이터를 쿠키형태로 저장
         var data = $.persist('home');
+        //
         var data_ = $.cookie('data_');
+
+        //persist 데이터가 있는 경우(뒤로 이동하기로 페이지 온 경우
         if(data) {
+            //data_id : 환자 id
             data_id = data.data_id;
+
+            //daterange에 있는 날짜 읽어오기
             $('body').html(data.html);
             $('input[name="daterange"]').val(data.date_data);
+
+            //환자 데이터를 바탕으로 관련 정보 가져오기
             $.ajax({
                 url : '/',
                 data : {
@@ -723,6 +732,7 @@ $(function() {
         }
     }
 
+    //상세보기로 이동
     function moveDetail(ruld_ids, id) {
         if(client_id != '' && id != '') {
             $.persist("home", {
